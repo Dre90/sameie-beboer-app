@@ -32,6 +32,34 @@ tsconfig.json       # jsx: react-jsx, types: vite/client + vite-plus/test/global
 - Import test utilities from `vite-plus/test` (not from `vitest`): `import { expect, test, vi } from "vite-plus/test"`.
 - Use `@testing-library/react` + `@testing-library/user-event` for component tests.
 
+## Commit messages
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) for **all** commits.
+
+Format: `<type>(<optional scope>): <description>`
+
+Common types:
+
+- `feat` — a new feature
+- `fix` — a bug fix
+- `docs` — documentation only
+- `style` — formatting / whitespace (no code change)
+- `refactor` — code change that neither fixes a bug nor adds a feature
+- `perf` — performance improvement
+- `test` — adding or updating tests
+- `build` — build system or dependency changes
+- `ci` — CI configuration changes
+- `chore` — other maintenance
+
+Examples:
+
+- `feat(auth): add login form`
+- `fix(router): handle missing trailing slash`
+- `docs: translate README to English`
+- `chore(deps): bump react to 19.2.5`
+
+Use `!` after the type/scope or a `BREAKING CHANGE:` footer to mark breaking changes.
+
 ## Workflow
 
 Always run via Vite+ (`vp ...`). See the Vite+ section below for details.
@@ -45,6 +73,7 @@ Always run via Vite+ (`vp ...`). See the Vite+ section below for details.
 
 - [ ] Read relevant files before making changes (especially `vite.config.ts` and `tsconfig.json`).
 - [ ] Run `vp check` and `vp test` after changes.
+- [ ] Use [Conventional Commits](https://www.conventionalcommits.org/) for all commit messages.
 - [ ] Do not install `vite`, `vitest`, `oxlint`, `oxfmt`, or `tsdown` directly — they are wrapped by Vite+.
 - [ ] Do not edit `package.json` scripts to duplicate Vite+'s built-in commands (e.g. do not add `tsc` before `vp build` — typechecking is handled by `vp check`).
 
