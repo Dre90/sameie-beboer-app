@@ -1,52 +1,52 @@
 # AGENTS.md
 
-Instruksjoner for AI-agenter som jobber i dette repoet.
+Instructions for AI agents working in this repository.
 
-## Prosjektoversikt
+## Project overview
 
-`sameie-beboer-app` er en app for beboere i et sameie. Stack:
+`sameie-beboer-app` is an app for residents of a housing cooperative. Stack:
 
 - **React 19** + **TypeScript** (strict, `jsx: react-jsx`)
-- **Tailwind CSS v4** via `@tailwindcss/vite` (importert i `src/style.css`)
-- **Vitest** (via Vite+) med `jsdom`, Testing Library og `jest-dom`-matchere
-- **Vite+** (`vp`) som samlet toolchain
+- **Tailwind CSS v4** via `@tailwindcss/vite` (imported in `src/style.css`)
+- **Vitest** (via Vite+) with `jsdom`, Testing Library, and `jest-dom` matchers
+- **Vite+** (`vp`) as the unified toolchain
 
-## Prosjektstruktur
+## Project structure
 
 ```
 src/
-  App.tsx           # Rot-komponent
-  App.test.tsx      # Tester for App
-  main.tsx          # React-entrypoint (ReactDOM.createRoot)
+  App.tsx           # Root component
+  App.test.tsx      # Tests for App
+  main.tsx          # React entrypoint (ReactDOM.createRoot)
   style.css         # @import "tailwindcss"
   test/setup.ts     # import "@testing-library/jest-dom/vitest"
-vite.config.ts      # plugins: react(), tailwindcss(); test-config med jsdom + setupFiles
+vite.config.ts      # plugins: react(), tailwindcss(); test config with jsdom + setupFiles
 tsconfig.json       # jsx: react-jsx, types: vite/client + vite-plus/test/globals + jest-dom
 ```
 
-## Konvensjoner
+## Conventions
 
-- Bruk funksjonelle React-komponenter og hooks. Eksporter navngitt (f.eks. `export function App()`).
-- Styling gjøres med Tailwind-utility-klasser direkte i JSX. Ikke lag egne CSS-filer med mindre det er nødvendig.
-- Test-filer ligger ved siden av modulen som `*.test.tsx` / `*.test.ts`.
-- Importer test-utilities fra `vite-plus/test` (ikke fra `vitest`): `import { expect, test, vi } from "vite-plus/test"`.
-- Bruk `@testing-library/react` + `@testing-library/user-event` for komponenttester.
+- Use functional React components and hooks. Use named exports (e.g. `export function App()`).
+- Styling is done with Tailwind utility classes directly in JSX. Do not create separate CSS files unless necessary.
+- Test files live next to the module as `*.test.tsx` / `*.test.ts`.
+- Import test utilities from `vite-plus/test` (not from `vitest`): `import { expect, test, vi } from "vite-plus/test"`.
+- Use `@testing-library/react` + `@testing-library/user-event` for component tests.
 
-## Arbeidsflyt
+## Workflow
 
-Kjør alltid via Vite+ (`vp ...`). Se Vite+-seksjonen under for detaljer.
+Always run via Vite+ (`vp ...`). See the Vite+ section below for details.
 
-- `vp dev` – dev-server
-- `vp test` – tester (watch). `vp test --run` for én gang.
-- `vp check` – format + lint + typecheck (kjør før commit). `vp check --fix` for auto-fiks.
-- `vp build` – produksjonsbygg
+- `vp dev` — dev server
+- `vp test` — tests (watch). `vp test --run` for a single run.
+- `vp check` — format + lint + typecheck (run before commit). `vp check --fix` to auto-fix.
+- `vp build` — production build
 
-## Agent-sjekkliste
+## Agent checklist
 
-- [ ] Les relevante filer før endringer (spesielt `vite.config.ts` og `tsconfig.json`).
-- [ ] Kjør `vp check` og `vp test` etter endringer.
-- [ ] Ikke installer `vite`, `vitest`, `oxlint`, `oxfmt` eller `tsdown` direkte – de er wrappet av Vite+.
-- [ ] Ikke rediger `package.json`-skript slik at de dupliserer Vite+ sine innebygde kommandoer (f.eks. ikke legg til `tsc` før `vp build` – typecheck gjøres av `vp check`).
+- [ ] Read relevant files before making changes (especially `vite.config.ts` and `tsconfig.json`).
+- [ ] Run `vp check` and `vp test` after changes.
+- [ ] Do not install `vite`, `vitest`, `oxlint`, `oxfmt`, or `tsdown` directly — they are wrapped by Vite+.
+- [ ] Do not edit `package.json` scripts to duplicate Vite+'s built-in commands (e.g. do not add `tsc` before `vp build` — typechecking is handled by `vp check`).
 
 ---
 

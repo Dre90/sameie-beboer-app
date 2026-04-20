@@ -1,53 +1,53 @@
 # sameie-beboer-app
 
-App for beboere i sameie. Bygget med React, TypeScript, Tailwind CSS og Vitest – drevet av [Vite+](https://vite.dev/).
+App for residents of a housing cooperative (sameie). Built with React, TypeScript, Tailwind CSS, and Vitest — powered by [Vite+](https://vite.dev/).
 
-## Teknologi
+## Tech stack
 
-- **React 19** + **TypeScript** – UI og typesikkerhet
-- **Tailwind CSS v4** – styling via `@tailwindcss/vite`
-- **Vitest** (gjennom Vite+) – enhetstester med `jsdom` og Testing Library
-- **Vite+** – samlet toolchain for dev, build, lint, format og test
+- **React 19** + **TypeScript** — UI and type safety
+- **Tailwind CSS v4** — styling via `@tailwindcss/vite`
+- **Vitest** (through Vite+) — unit tests with `jsdom` and Testing Library
+- **Vite+** — unified toolchain for dev, build, lint, format, and test
 
-## Kom i gang
+## Getting started
 
-Krever [Node.js](https://nodejs.org/) og [pnpm](https://pnpm.io/). Vite+ CLI installeres som del av dev-dependencies (`vp`).
+Requires [Node.js](https://nodejs.org/) and [pnpm](https://pnpm.io/). The Vite+ CLI (`vp`) is installed as part of dev-dependencies.
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Appen kjører på http://localhost:5173.
+The app runs at http://localhost:5173.
 
-## Skript
+## Scripts
 
-| Kommando       | Beskrivelse                            |
-| -------------- | -------------------------------------- |
-| `pnpm dev`     | Starter dev-server med HMR             |
-| `pnpm build`   | Bygger produksjonsversjon til `dist/`  |
-| `pnpm preview` | Forhåndsviser produksjonsbygget lokalt |
-| `pnpm test`    | Kjører tester (watch-modus)            |
-| `pnpm check`   | Kjører format-, lint- og typesjekk     |
-| `pnpm lint`    | Kun lint                               |
-| `pnpm fmt`     | Kun formatering                        |
+| Command        | Description                          |
+| -------------- | ------------------------------------ |
+| `pnpm dev`     | Start the dev server with HMR        |
+| `pnpm build`   | Build for production into `dist/`    |
+| `pnpm preview` | Preview the production build locally |
+| `pnpm test`    | Run tests (watch mode)               |
+| `pnpm check`   | Run format, lint, and type checks    |
+| `pnpm lint`    | Lint only                            |
+| `pnpm fmt`     | Format only                          |
 
-Tips: kjør `pnpm check -- --fix` for å auto-rette lint- og formatfeil.
+Tip: run `pnpm check -- --fix` to auto-fix lint and formatting issues.
 
-## Prosjektstruktur
+## Project structure
 
 ```
 src/
-  App.tsx           # Rot-komponent
-  App.test.tsx      # Tester for App
-  main.tsx          # React-entrypoint
-  style.css         # Tailwind-import
-  test/setup.ts     # Test-setup (jest-dom matchere)
+  App.tsx           # Root component
+  App.test.tsx      # Tests for App
+  main.tsx          # React entrypoint
+  style.css         # Tailwind import
+  test/setup.ts     # Test setup (jest-dom matchers)
 ```
 
 ## Testing
 
-Tester skrives med [Testing Library](https://testing-library.com/docs/react-testing-library/intro/) og kjøres av Vitest via Vite+. Kjør én gang med:
+Tests are written with [Testing Library](https://testing-library.com/docs/react-testing-library/intro/) and run by Vitest through Vite+. Run once with:
 
 ```bash
 pnpm test --run
