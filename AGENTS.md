@@ -32,6 +32,16 @@ tsconfig.json       # jsx: react-jsx, types: vite/client + vite-plus/test/global
 - Import test utilities from `vite-plus/test` (not from `vitest`): `import { expect, test, vi } from "vite-plus/test"`.
 - Use `@testing-library/react` + `@testing-library/user-event` for component tests.
 
+## Testing policy
+
+**Write tests for everything.** The goal is as close to 100% test coverage as practical.
+
+- Every new component, hook, helper or bug fix must ship with tests in the same PR/commit.
+- Prefer behavioural tests via Testing Library (simulate what the user does) over implementation details.
+- Pure logic (data/geometry/utilities) should have direct unit tests.
+- Run `vp test --run --coverage` to check coverage; address uncovered branches before committing.
+- If something is genuinely untestable (e.g. a trivial icon-only component), note why in the PR description rather than silently skip.
+
 ## Commit messages
 
 Use [Conventional Commits](https://www.conventionalcommits.org/) for **all** commits.
@@ -73,6 +83,7 @@ Always run via Vite+ (`vp ...`). See the Vite+ section below for details.
 
 - [ ] Read relevant files before making changes (especially `vite.config.ts` and `tsconfig.json`).
 - [ ] Run `vp check` and `vp test` after changes.
+- [ ] Write tests for every new component, hook, helper or bug fix (aim for ~100% coverage).
 - [ ] Use [Conventional Commits](https://www.conventionalcommits.org/) for all commit messages.
 - [ ] Do not install `vite`, `vitest`, `oxlint`, `oxfmt`, or `tsdown` directly — they are wrapped by Vite+.
 - [ ] Do not edit `package.json` scripts to duplicate Vite+'s built-in commands (e.g. do not add `tsc` before `vp build` — typechecking is handled by `vp check`).
