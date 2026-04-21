@@ -8,26 +8,38 @@ Instructions for AI agents working in this repository.
 
 - **React 19** + **TypeScript** (strict, `jsx: react-jsx`)
 - **Tailwind CSS v4** via `@tailwindcss/vite` (imported in `src/style.css`)
+- **shadcn/ui** on the **Base UI** primitive library (`base`, not `radix`). Config in `components.json`.
 - **Vitest** (via Vite+) with `jsdom`, Testing Library, and `jest-dom` matchers
 - **Vite+** (`vp`) as the unified toolchain
+- Path alias `@/*` → `src/*` (configured in both `tsconfig.json` and `vite.config.ts`)
 
 ## Project structure
 
 ```
 src/
-  App.tsx           # Root component
-  App.test.tsx      # Tests for App
-  main.tsx          # React entrypoint (ReactDOM.createRoot)
-  style.css         # @import "tailwindcss"
-  test/setup.ts     # import "@testing-library/jest-dom/vitest"
-vite.config.ts      # plugins: react(), tailwindcss(); test config with jsdom + setupFiles
-tsconfig.json       # jsx: react-jsx, types: vite/client + vite-plus/test/globals + jest-dom
+  AppShell.tsx        # App layout shell
+  main.tsx            # React entrypoint (ReactDOM.createRoot + RouterProvider)
+  router.tsx          # react-router-dom routes
+  style.css           # @import "tailwindcss" + shadcn theme tokens
+  components/ui/      # shadcn/ui components (managed via shadcn CLI)
+  lib/utils.ts        # `cn()` helper used by shadcn components
+  features/           # Feature modules (e.g. `map/`)
+  hooks/              # Shared hooks
+  test/setup.ts       # import "@testing-library/jest-dom/vitest"
+components.json       # shadcn config (style, base="base", aliases)
+vite.config.ts        # plugins, `@` alias, test config with jsdom + setupFiles
+tsconfig.json         # jsx: react-jsx, `@/*` path alias, test-globals types
+.agents/skills/shadcn # shadcn Skill docs loaded by agents working with UI
 ```
 
 ## Conventions
 
 - Use functional React components and hooks. Use named exports (e.g. `export function App()`).
 - Styling is done with Tailwind utility classes directly in JSX. Do not create separate CSS files unless necessary.
+- Use semantic color tokens (`bg-background`, `text-muted-foreground`, `border-border`, …) — **not** raw Tailwind colors like `bg-white` or `dark:bg-slate-900`. Theme is defined in `src/style.css`.
+- Prefer existing shadcn/ui components over custom markup (see the shadcn Skill for the full rule set, including `FieldGroup` for forms, `ToggleGroup` for option sets, `Alert` for callouts, etc.).
+- Add shadcn components with `vp dlx shadcn@latest add <name>`. Do **not** fetch component source manually. The project uses the **Base UI** base (`render` prop for custom triggers, not `asChild`).
+- Import UI components from `@/components/ui/...` and utils from `@/lib/utils`. Prefer the `@/` alias over long relative paths.
 - Test files live next to the module as `*.test.tsx` / `*.test.ts`.
 - Import test utilities from `vite-plus/test` (not from `vitest`): `import { expect, test, vi } from "vite-plus/test"`.
 - Use `@testing-library/react` + `@testing-library/user-event` for component tests.
@@ -87,6 +99,7 @@ Always run via Vite+ (`vp ...`). See the Vite+ section below for details.
 - [ ] Use [Conventional Commits](https://www.conventionalcommits.org/) for all commit messages.
 - [ ] Do not install `vite`, `vitest`, `oxlint`, `oxfmt`, or `tsdown` directly — they are wrapped by Vite+.
 - [ ] Do not edit `package.json` scripts to duplicate Vite+'s built-in commands (e.g. do not add `tsc` before `vp build` — typechecking is handled by `vp check`).
+- [ ] When adding UI, use shadcn components (via `vp dlx shadcn@latest add`) before writing custom markup. Follow the rules in `.agents/skills/shadcn/SKILL.md`.
 
 ---
 
