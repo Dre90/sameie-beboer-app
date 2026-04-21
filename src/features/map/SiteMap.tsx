@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Drawer } from "vaul";
+import { MenuIcon, XIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { FloorTabs } from "./FloorTabs";
 import { MapCanvas } from "./MapCanvas";
@@ -30,7 +32,7 @@ export function SiteMap() {
   return (
     <div className="relative h-[calc(100dvh-4rem)] w-full overflow-hidden">
       {/* Desktop sidebar */}
-      <aside className="absolute inset-y-0 left-0 z-10 hidden w-80 flex-col gap-3 border-r border-slate-200 bg-white p-3 md:flex dark:border-slate-800 dark:bg-slate-900">
+      <aside className="absolute inset-y-0 left-0 z-10 hidden w-80 flex-col gap-3 border-r border-border bg-background p-3 md:flex">
         <FloorTabs floor={floor} onChange={setFloor} />
         <UnitList selectedId={selectedId} onSelect={handleSelect} currentFloor={floor} />
       </aside>
@@ -47,28 +49,15 @@ export function SiteMap() {
 
       {/* Mobile floating top bar */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start gap-2 p-3 md:hidden">
-        <button
-          type="button"
+        <Button
+          variant="outline"
+          size="icon"
           onClick={() => setListOpen(true)}
           aria-label="Åpne liste"
-          className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-lg border border-slate-200 bg-white/90 text-slate-700 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-200"
+          className="pointer-events-auto bg-background/90 backdrop-blur"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-5 w-5"
-            aria-hidden="true"
-          >
-            <line x1="4" y1="6" x2="20" y2="6" />
-            <line x1="4" y1="12" x2="20" y2="12" />
-            <line x1="4" y1="18" x2="20" y2="18" />
-          </svg>
-        </button>
+          <MenuIcon />
+        </Button>
         <div className="pointer-events-auto flex-1">
           <FloorTabs floor={floor} onChange={setFloor} className="shadow-sm" />
         </div>
@@ -76,78 +65,48 @@ export function SiteMap() {
 
       {/* Desktop info panel — right-side sidebar */}
       {selected && isDesktop && (
-        <aside className="absolute inset-y-0 right-0 z-10 hidden w-96 flex-col overflow-y-auto border-l border-slate-200 bg-white p-5 md:flex dark:border-slate-800 dark:bg-slate-900">
+        <aside className="absolute inset-y-0 right-0 z-10 hidden w-96 flex-col overflow-y-auto border-l border-border bg-background p-5 md:flex">
           <div className="flex items-start justify-between gap-2">
             <UnitInfo unit={selected} />
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              size="icon-sm"
               onClick={() => setSelectedId(null)}
               aria-label="Lukk"
-              className="rounded p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800"
             >
-              ×
-            </button>
+              <XIcon />
+            </Button>
           </div>
         </aside>
       )}
 
-      {/* Mobile list drawer (from left) */}
-      <Drawer.Root
-        open={listOpen}
-        onOpenChange={setListOpen}
-        direction="left"
-        shouldScaleBackground={false}
-      >
-        <Drawer.Portal>
-          <Drawer.Overlay className="fixed inset-0 z-40 bg-black/40 md:hidden" />
-          <Drawer.Content
-            aria-describedby={undefined}
-            className="fixed inset-y-0 left-0 z-50 flex w-80 max-w-[85vw] flex-col bg-white p-3 outline-none md:hidden dark:bg-slate-900"
-          >
-            <Drawer.Title className="sr-only">Leiligheter</Drawer.Title>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-lg font-bold">Leiligheter</h2>
-              <button
-                type="button"
-                onClick={() => setListOpen(false)}
-                aria-label="Lukk"
-                className="rounded p-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-              >
-                ×
-              </button>
-            </div>
-            <FloorTabs floor={floor} onChange={setFloor} />
-            <div className="mt-3 flex min-h-0 flex-1 flex-col">
-              <UnitList selectedId={selectedId} onSelect={handleSelect} currentFloor={floor} />
-            </div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
+      {/* Mobile list sheet (from left) */}
+      <Sheet open={listOpen} onOpenChange={setListOpen}>
+        <SheetContent side="left" className="flex w-80 max-w-[85vw] flex-col p-3">
+          <SheetHeader className="p-0">
+            <SheetTitle>Leiligheter</SheetTitle>
+          </SheetHeader>
+          <FloorTabs floor={floor} onChange={setFloor} />
+          <div className="mt-3 flex min-h-0 flex-1 flex-col">
+            <UnitList selectedId={selectedId} onSelect={handleSelect} currentFloor={floor} />
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Mobile info bottom sheet */}
-      <Drawer.Root
+      <Sheet
         open={!!selected && !isDesktop}
         onOpenChange={(open) => {
           if (!open) setSelectedId(null);
         }}
       >
-        <Drawer.Portal>
-          <Drawer.Overlay className="fixed inset-0 z-40 bg-black/40 md:hidden" />
-          <Drawer.Content
-            aria-describedby={undefined}
-            className="fixed inset-x-0 bottom-0 z-50 mt-24 flex max-h-[85vh] flex-col rounded-t-2xl bg-white p-5 outline-none md:hidden dark:bg-slate-900"
-          >
-            <Drawer.Title className="sr-only">
-              {selected ? `Leilighet ${selected.label}` : "Leilighet"}
-            </Drawer.Title>
-            <div
-              aria-hidden="true"
-              className="mx-auto mb-4 h-1.5 w-12 flex-shrink-0 rounded-full bg-slate-300 dark:bg-slate-700"
-            />
-            <div className="overflow-y-auto">{selected && <UnitInfo unit={selected} />}</div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
+        <SheetContent side="bottom" className="max-h-[85vh] rounded-t-2xl p-5">
+          <SheetHeader className="sr-only p-0">
+            <SheetTitle>{selected ? `Leilighet ${selected.label}` : "Leilighet"}</SheetTitle>
+          </SheetHeader>
+          <div className="overflow-y-auto">{selected && <UnitInfo unit={selected} />}</div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

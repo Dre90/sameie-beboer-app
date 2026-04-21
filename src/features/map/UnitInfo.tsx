@@ -1,28 +1,32 @@
 import { type Unit } from "./data/units";
 
+const buildingLabels = {
+  A: "Bygg A",
+  B: "Bygg B",
+  C: "Rekkehus C (alle etasjer)",
+} as const;
+
 export function UnitInfo({ unit }: { unit: Unit }) {
+  const location =
+    unit.building === "C"
+      ? buildingLabels.C
+      : `${buildingLabels[unit.building]} — ${unit.floor}. etg`;
+
   return (
-    <div>
-      <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{unit.label}</h2>
-      <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-        {unit.building === "A"
-          ? "Bygg A"
-          : unit.building === "B"
-            ? "Bygg B"
-            : "Rekkehus C (alle etasjer)"}
-        {unit.building !== "C" && "floor" in unit && ` — ${unit.floor}. etg`}
-      </p>
-      <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-        <dt className="text-slate-500 dark:text-slate-400">Beboer</dt>
-        <dd className="text-slate-700 dark:text-slate-300">—</dd>
-        <dt className="text-slate-500 dark:text-slate-400">Sist filterbytte</dt>
-        <dd className="text-slate-700 dark:text-slate-300">—</dd>
-        <dt className="text-slate-500 dark:text-slate-400">Notater</dt>
-        <dd className="text-slate-700 dark:text-slate-300">—</dd>
+    <div className="flex flex-col gap-4">
+      <div>
+        <h2 className="font-heading text-2xl font-medium text-foreground">{unit.label}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{location}</p>
+      </div>
+      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+        <dt className="text-muted-foreground">Beboer</dt>
+        <dd className="text-foreground">—</dd>
+        <dt className="text-muted-foreground">Sist filterbytte</dt>
+        <dd className="text-foreground">—</dd>
+        <dt className="text-muted-foreground">Notater</dt>
+        <dd className="text-foreground">—</dd>
       </dl>
-      <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">
-        Beboerinfo kobles på senere.
-      </p>
+      <p className="text-xs text-muted-foreground">Beboerinfo kobles på senere.</p>
     </div>
   );
 }

@@ -15,13 +15,7 @@ export function FloorPlan({ geometry, selectedId, onSelect, floor }: Props) {
       role="img"
       aria-label={`Etasjeplan ${floor}. etasje`}
     >
-      <rect
-        x={0}
-        y={0}
-        width={VIEW_BOX.width}
-        height={VIEW_BOX.height}
-        className="fill-slate-50 dark:fill-slate-900"
-      />
+      <rect x={0} y={0} width={VIEW_BOX.width} height={VIEW_BOX.height} className="fill-muted" />
       {Object.entries(geometry).map(([id, rect]) => {
         const isSelected = id === selectedId;
         const isTownhouse = id.startsWith("C");
@@ -36,7 +30,7 @@ export function FloorPlan({ geometry, selectedId, onSelect, floor }: Props) {
               onClick={() => onSelect(id)}
               data-selected={isSelected}
               data-townhouse={isTownhouse}
-              className="cursor-pointer stroke-slate-400 transition-colors fill-slate-200 hover:fill-purple-200 data-[selected=true]:fill-purple-500 data-[selected=true]:stroke-purple-700 dark:fill-slate-700 dark:hover:fill-purple-800 dark:data-[selected=true]:fill-purple-500"
+              className="cursor-pointer stroke-border transition-colors fill-secondary hover:fill-accent data-[selected=true]:fill-primary data-[selected=true]:stroke-primary"
               strokeWidth={1.5}
             />
             <text
@@ -44,7 +38,8 @@ export function FloorPlan({ geometry, selectedId, onSelect, floor }: Props) {
               y={rect.y + rect.h / 2}
               textAnchor="middle"
               dominantBaseline="central"
-              className="pointer-events-none select-none fill-slate-700 text-[18px] font-semibold dark:fill-slate-200"
+              className="pointer-events-none select-none fill-foreground text-[18px] font-semibold data-[selected=true]:fill-primary-foreground"
+              data-selected={isSelected}
             >
               {id}
             </text>

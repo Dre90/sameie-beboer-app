@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { MaximizeIcon, MinusIcon, PlusIcon } from "lucide-react";
 import {
   TransformComponent,
   TransformWrapper,
@@ -6,6 +7,7 @@ import {
   useTransformContext,
   useTransformEffect,
 } from "react-zoom-pan-pinch";
+import { Button } from "@/components/ui/button";
 import { FloorPlan } from "./FloorPlan";
 import { type UnitGeometry } from "./data/geometry";
 import { MAX_SCALE, MIN_SCALE, nextStop, zoomPreservingCenter } from "./zoom";
@@ -24,7 +26,7 @@ export function MapCanvas({
   onSelect: (id: string) => void;
 }) {
   return (
-    <div className="relative h-full w-full overflow-hidden bg-slate-50 dark:bg-slate-950">
+    <div className="relative h-full w-full overflow-hidden bg-muted">
       <TransformWrapper
         minScale={MIN_SCALE}
         maxScale={MAX_SCALE}
@@ -123,81 +125,41 @@ function ZoomControls() {
 
   return (
     <div
-      className="absolute right-3 bottom-3 z-10 flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-white/95 shadow-md backdrop-blur dark:border-slate-700 dark:bg-slate-900/95"
+      className="absolute right-3 bottom-3 z-10 flex flex-col items-center gap-1 rounded-2xl border border-border bg-card/95 p-1 shadow-md backdrop-blur"
       aria-label="Zoom-kontroller"
     >
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={() => stepZoom(1)}
         disabled={atMax}
         aria-label="Zoom inn"
-        className="flex h-11 w-11 items-center justify-center text-slate-700 hover:bg-slate-100 disabled:opacity-40 dark:text-slate-200 dark:hover:bg-slate-800"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-5 w-5"
-          aria-hidden="true"
-        >
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-      </button>
+        <PlusIcon />
+      </Button>
       <div
         aria-live="polite"
-        className="border-y border-slate-200 px-1 py-1 text-center text-[10px] font-medium tabular-nums text-slate-600 dark:border-slate-700 dark:text-slate-300"
+        className="px-1 py-0.5 text-center text-[10px] font-medium tabular-nums text-muted-foreground"
       >
         {pct}%
       </div>
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={() => stepZoom(-1)}
         disabled={atMin}
         aria-label="Zoom ut"
-        className="flex h-11 w-11 items-center justify-center text-slate-700 hover:bg-slate-100 disabled:opacity-40 dark:text-slate-200 dark:hover:bg-slate-800"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-5 w-5"
-          aria-hidden="true"
-        >
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-      </button>
-      <button
-        type="button"
+        <MinusIcon />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={() => resetTransform()}
         aria-label="Tilbakestill zoom"
-        className="flex h-11 w-11 items-center justify-center border-t border-slate-200 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-5 w-5"
-          aria-hidden="true"
-        >
-          <polyline points="9 3 3 3 3 9" />
-          <polyline points="15 3 21 3 21 9" />
-          <polyline points="21 15 21 21 15 21" />
-          <polyline points="3 15 3 21 9 21" />
-        </svg>
-      </button>
+        <MaximizeIcon />
+      </Button>
     </div>
   );
 }

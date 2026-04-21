@@ -1,7 +1,17 @@
 import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Empty, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { allUnits } from "./data/units";
 
 type Floor = 1 | 2 | 3;
+
+const buildingLabels = {
+  A: "Bygg A",
+  B: "Bygg B",
+  C: "Rekkehus C",
+} as const;
 
 export function UnitList({
   selectedId,
@@ -28,43 +38,41 @@ export function UnitList({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2">
-      <label className="relative block">
+      <label className="block">
         <span className="sr-only">Søk etter leilighet</span>
-        <input
+        <Input
           type="search"
-          inputMode="text"
           placeholder="Søk (f.eks. B23)"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-purple-500 focus:outline-none focus:ring-2 focus:ring-purple-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-purple-900"
         />
       </label>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto rounded-lg border border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-2xl border border-border bg-card p-3">
         {(["A", "B", "C"] as const).map((b) => {
           const items = grouped[b];
           if (items.length === 0) return null;
           return (
-            <section key={b}>
-              <h3 className="px-1 py-1 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                {b === "A" ? "Bygg A" : b === "B" ? "Bygg B" : "Rekkehus C"}
+            <section key={b} className="flex flex-col gap-2">
+              <h3 className="px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                {buildingLabels[b]}
               </h3>
-              <ul className="grid grid-cols-3 gap-1">
+              <ul className="grid grid-cols-3 gap-1.5">
                 {items.map((u) => {
                   const onCurrentFloor =
                     u.building === "C" || ("floor" in u && u.floor === currentFloor);
                   const isSelected = u.id === selectedId;
                   return (
                     <li key={u.id}>
-                      <button
-                        type="button"
+                      <Button
+                        variant={isSelected ? "default" : "outline"}
+                        size="sm"
                         onClick={() => onSelect(u.id)}
                         aria-pressed={isSelected}
-                        className="min-h-11 w-full rounded border border-slate-200 px-2 py-2 text-sm font-medium text-slate-700 hover:bg-purple-50 aria-pressed:border-purple-600 aria-pressed:bg-purple-600 aria-pressed:text-white dark:border-slate-700 dark:text-slate-200 dark:hover:bg-purple-950"
-                        style={{ opacity: onCurrentFloor ? 1 : 0.45 }}
+                        className={cn("w-full", !onCurrentFloor && "opacity-50")}
                       >
                         {u.label}
-                      </button>
+                      </Button>
                     </li>
                   );
                 })}
@@ -73,9 +81,11 @@ export function UnitList({
           );
         })}
         {filtered.length === 0 && (
-          <p className="px-2 py-4 text-center text-sm text-slate-500 dark:text-slate-400">
-            Ingen treff
-          </p>
+          <Empty className="p-6">
+            <EmptyHeader>
+              <EmptyTitle>Ingen treff</EmptyTitle>
+            </EmptyHeader>
+          </Empty>
         )}
       </div>
     </div>
