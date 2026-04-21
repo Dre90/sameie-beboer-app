@@ -9,8 +9,8 @@ import {
 } from "react-zoom-pan-pinch";
 import { Button } from "@/components/ui/button";
 import { FloorPlan } from "./FloorPlan";
-import { type UnitGeometry } from "./data/geometry";
-import { MAX_SCALE, MIN_SCALE, nextStop, zoomPreservingCenter } from "./zoom";
+import { type UnitGeometry } from "../data/geometry";
+import { MAX_SCALE, MIN_SCALE, nextStop, zoomPreservingCenter } from "../lib/zoom";
 
 type Floor = 1 | 2 | 3;
 
@@ -26,7 +26,7 @@ export function MapCanvas({
   onSelect: (id: string) => void;
 }) {
   return (
-    <div className="relative h-full w-full overflow-hidden bg-muted">
+    <div className="relative h-full w-full overflow-hidden bg-background">
       <TransformWrapper
         minScale={MIN_SCALE}
         maxScale={MAX_SCALE}

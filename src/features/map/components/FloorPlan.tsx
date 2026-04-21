@@ -1,4 +1,4 @@
-import { type UnitGeometry, VIEW_BOX } from "./data/geometry";
+import { type UnitGeometry, VIEW_BOX } from "../data/geometry";
 
 type Props = {
   geometry: UnitGeometry;
@@ -15,7 +15,13 @@ export function FloorPlan({ geometry, selectedId, onSelect, floor }: Props) {
       role="img"
       aria-label={`Etasjeplan ${floor}. etasje`}
     >
-      <rect x={0} y={0} width={VIEW_BOX.width} height={VIEW_BOX.height} className="fill-muted" />
+      <rect
+        x={0}
+        y={0}
+        width={VIEW_BOX.width}
+        height={VIEW_BOX.height}
+        className="fill-background"
+      />
       {Object.entries(geometry).map(([id, rect]) => {
         const isSelected = id === selectedId;
         const isTownhouse = id.startsWith("C");
@@ -30,7 +36,7 @@ export function FloorPlan({ geometry, selectedId, onSelect, floor }: Props) {
               onClick={() => onSelect(id)}
               data-selected={isSelected}
               data-townhouse={isTownhouse}
-              className="cursor-pointer stroke-border transition-colors fill-secondary hover:fill-accent data-[selected=true]:fill-primary data-[selected=true]:stroke-primary"
+              className="cursor-pointer stroke-border transition-colors fill-secondary hover:fill-primary/25 hover:stroke-primary data-[selected=true]:fill-primary data-[selected=true]:stroke-primary"
               strokeWidth={1.5}
             />
             <text

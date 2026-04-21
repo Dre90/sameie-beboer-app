@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Empty, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { allUnits } from "./data/units";
+import { allUnits } from "../data/units";
 
 type Floor = 1 | 2 | 3;
 
@@ -69,7 +69,12 @@ export function UnitList({
                         size="sm"
                         onClick={() => onSelect(u.id)}
                         aria-pressed={isSelected}
-                        className={cn("w-full", !onCurrentFloor && "opacity-50")}
+                        className={cn(
+                          "w-full",
+                          !isSelected &&
+                            "hover:border-primary hover:bg-primary/15 hover:text-foreground",
+                          !onCurrentFloor && "opacity-50",
+                        )}
                       >
                         {u.label}
                       </Button>

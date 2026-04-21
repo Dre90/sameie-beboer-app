@@ -2,7 +2,7 @@ import { expect, test } from "vite-plus/test";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MapCanvas } from "./MapCanvas";
-import { floor1Geometry } from "./data/geometry";
+import { floor1Geometry } from "../data/geometry";
 
 function noop() {}
 

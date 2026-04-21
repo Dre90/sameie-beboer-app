@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppShell } from "./AppShell";
-import { SiteMap } from "./features/map/SiteMap";
+import { SiteMap } from "./features/map";
 
 export const router = createBrowserRouter([
   {

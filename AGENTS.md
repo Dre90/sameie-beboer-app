@@ -23,7 +23,14 @@ src/
   style.css           # @import "tailwindcss" + shadcn theme tokens
   components/ui/      # shadcn/ui components (managed via shadcn CLI)
   lib/utils.ts        # `cn()` helper used by shadcn components
-  features/           # Feature modules (e.g. `map/`)
+  features/           # Feature modules. Each feature follows:
+                      #   <feature>/
+                      #     index.ts          # barrel, exports the feature entry
+                      #     <Feature>.tsx     # feature entry/container
+                      #     components/       # presentational components (+ *.test.tsx)
+                      #     lib/              # pure TS helpers (+ *.test.ts)
+                      #     data/             # static data / fixtures
+                      #     hooks/            # feature-local hooks (if any)
   hooks/              # Shared hooks
   test/setup.ts       # import "@testing-library/jest-dom/vitest"
 components.json       # shadcn config (style, base="base", aliases)
@@ -40,6 +47,7 @@ tsconfig.json         # jsx: react-jsx, `@/*` path alias, test-globals types
 - Prefer existing shadcn/ui components over custom markup (see the shadcn Skill for the full rule set, including `FieldGroup` for forms, `ToggleGroup` for option sets, `Alert` for callouts, etc.).
 - Add shadcn components with `vp dlx shadcn@latest add <name>`. Do **not** fetch component source manually. The project uses the **Base UI** base (`render` prop for custom triggers, not `asChild`).
 - Import UI components from `@/components/ui/...` and utils from `@/lib/utils`. Prefer the `@/` alias over long relative paths.
+- Import a feature from its barrel (e.g. `@/features/map`), not from its internal files, when consuming it from outside the feature.
 - Test files live next to the module as `*.test.tsx` / `*.test.ts`.
 - Import test utilities from `vite-plus/test` (not from `vitest`): `import { expect, test, vi } from "vite-plus/test"`.
 - Use `@testing-library/react` + `@testing-library/user-event` for component tests.

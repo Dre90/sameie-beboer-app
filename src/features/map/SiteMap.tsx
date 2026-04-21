@@ -3,10 +3,10 @@ import { MenuIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
-import { FloorTabs } from "./FloorTabs";
-import { MapCanvas } from "./MapCanvas";
-import { UnitInfo } from "./UnitInfo";
-import { UnitList } from "./UnitList";
+import { FloorTabs } from "./components/FloorTabs";
+import { MapCanvas } from "./components/MapCanvas";
+import { UnitInfo } from "./components/UnitInfo";
+import { UnitList } from "./components/UnitList";
 import { geometryByFloor } from "./data/geometry";
 import { unitsById } from "./data/units";
 
@@ -58,8 +58,8 @@ export function SiteMap() {
         >
           <MenuIcon />
         </Button>
-        <div className="pointer-events-auto flex-1">
-          <FloorTabs floor={floor} onChange={setFloor} className="shadow-sm" />
+        <div className="pointer-events-auto flex-1 rounded-full border border-border bg-background/90 shadow-sm backdrop-blur">
+          <FloorTabs floor={floor} onChange={setFloor} />
         </div>
       </div>
 
@@ -82,12 +82,14 @@ export function SiteMap() {
 
       {/* Mobile list sheet (from left) */}
       <Sheet open={listOpen} onOpenChange={setListOpen}>
-        <SheetContent side="left" className="flex w-80 max-w-[85vw] flex-col p-3">
-          <SheetHeader className="p-0">
+        <SheetContent side="left" className="flex w-[22rem] max-w-[90vw] flex-col gap-3 p-4">
+          <SheetHeader className="p-0 pr-10">
             <SheetTitle>Leiligheter</SheetTitle>
           </SheetHeader>
-          <FloorTabs floor={floor} onChange={setFloor} />
-          <div className="mt-3 flex min-h-0 flex-1 flex-col">
+          <div className="pt-2">
+            <FloorTabs floor={floor} onChange={setFloor} />
+          </div>
+          <div className="flex min-h-0 flex-1 flex-col">
             <UnitList selectedId={selectedId} onSelect={handleSelect} currentFloor={floor} />
           </div>
         </SheetContent>

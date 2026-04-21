@@ -1,4 +1,4 @@
-import { type Unit } from "./data/units";
+import { type Unit } from "../data/units";
 
 const buildingLabels = {
   A: "Bygg A",
