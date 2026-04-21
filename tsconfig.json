@@ -6,6 +6,11 @@
     "types": ["vite/client", "vite-plus/test/globals", "@testing-library/jest-dom"],
     "skipLibCheck": true,
 
+    /* Path aliases */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
