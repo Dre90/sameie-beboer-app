@@ -37,3 +37,18 @@ test("search filters unit list", async () => {
   expect(screen.queryAllByRole("button", { name: "A11" })).toHaveLength(0);
   expect(screen.getAllByRole("button", { name: "B21" }).length).toBeGreaterThan(0);
 });
+
+test("opening the mobile list button exposes the list sheet", async () => {
+  const user = userEvent.setup();
+  render(<SiteMap />);
+  await user.click(screen.getByRole("button", { name: "Åpne liste" }));
+  expect(await screen.findByRole("dialog")).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "Leiligheter" })).toBeInTheDocument();
+});
+
+test("selecting a townhouse shows the rekkehus label", async () => {
+  const user = userEvent.setup();
+  render(<SiteMap />);
+  await user.click(screen.getAllByRole("button", { name: "C3" })[0]);
+  expect(screen.getByText("Rekkehus C (alle etasjer)")).toBeInTheDocument();
+});
