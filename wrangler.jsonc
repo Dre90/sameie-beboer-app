@@ -1,12 +1,27 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "sameie-beboer-app",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-04-23",
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": "./dist",
     "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"],
   },
   "observability": {
     "enabled": true,
   },
+  // Filled in via the Cloudflare dashboard (Worker → Settings → Variables):
+  //   ACCESS_TEAM_DOMAIN  e.g. "your-team.cloudflareaccess.com"
+  //   ACCESS_AUD          Access Application Audience (AUD) tag
+  //   DEV_BYPASS_AUTH     (local dev only) set "true" to skip JWT verification
+  //   DEV_USER_EMAIL      (local dev only) email to impersonate
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "sameie-beboer-app-db",
+      "database_id": "c13198ee-aa67-43c6-94ed-132d48a74ad7",
+    },
+  ],
 }

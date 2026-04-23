@@ -13,6 +13,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/api": "http://127.0.0.1:8787",
+      "/cdn-cgi": "http://127.0.0.1:8787",
+    },
+  },
   staged: {
     "*": "vp check --fix",
   },
