@@ -11,7 +11,9 @@
     "check": "vp check",
     "lint": "vp lint",
     "fmt": "vp fmt",
-    "prepare": "vp config"
+    "prepare": "vp config",
+    "deploy": "vp build && wrangler deploy",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
@@ -43,8 +45,8 @@
     "@vitest/coverage-v8": "^4.1.5",
     "jsdom": "^29.0.2",
     "typescript": "~6.0.2",
-    "vite": "catalog:",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "wrangler": "^4.84.1"
   },
   "packageManager": "pnpm@10.33.0"
 }
