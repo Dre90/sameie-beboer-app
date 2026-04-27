@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { FloorPlan } from "./FloorPlan";
 import { type UnitGeometry } from "../data/geometry";
+import { type UnitToneMap } from "../lib/tone";
 import { MAX_SCALE, MIN_SCALE, nextStop, zoomPreservingCenter } from "../lib/zoom";
 
 type Floor = 1 | 2 | 3;
@@ -19,11 +20,13 @@ export function MapCanvas({
   floor,
   selectedId,
   onSelect,
+  unitTone,
 }: {
   geometry: UnitGeometry;
   floor: Floor;
   selectedId: string | null;
   onSelect: (id: string) => void;
+  unitTone?: UnitToneMap;
 }) {
   return (
     <div className="relative h-full w-full overflow-hidden bg-background">
@@ -44,6 +47,7 @@ export function MapCanvas({
               selectedId={selectedId}
               onSelect={onSelect}
               floor={floor}
+              unitTone={unitTone}
             />
           </TransformComponent>
         </WheelHandler>

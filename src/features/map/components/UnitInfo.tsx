@@ -1,4 +1,5 @@
 import { type Unit } from "../data/units";
+import { UnitContactInfo } from "./UnitContactInfo";
 
 const buildingLabels = {
   A: "Bygg A",
@@ -18,15 +19,7 @@ export function UnitInfo({ unit }: { unit: Unit }) {
         <h2 className="font-heading text-2xl font-medium text-foreground">{unit.label}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{location}</p>
       </div>
-      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-        <dt className="text-muted-foreground">Beboer</dt>
-        <dd className="text-foreground">—</dd>
-        <dt className="text-muted-foreground">Sist filterbytte</dt>
-        <dd className="text-foreground">—</dd>
-        <dt className="text-muted-foreground">Notater</dt>
-        <dd className="text-foreground">—</dd>
-      </dl>
-      <p className="text-xs text-muted-foreground">Beboerinfo kobles på senere.</p>
+      <UnitContactInfo unitId={unit.id} />
     </div>
   );
 }

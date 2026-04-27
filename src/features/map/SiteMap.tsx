@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { MenuIcon, XIcon } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { ChevronLeftIcon, ChevronRightIcon, MenuIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
@@ -8,11 +8,25 @@ import { MapCanvas } from "./components/MapCanvas";
 import { UnitInfo } from "./components/UnitInfo";
 import { UnitList } from "./components/UnitList";
 import { geometryByFloor } from "./data/geometry";
-import { unitsById } from "./data/units";
+import { allUnits, unitsById, type Unit } from "./data/units";
+import { type UnitToneMap } from "./lib/tone";
 
 type Floor = 1 | 2 | 3;
 
-export function SiteMap() {
+export type SiteMapProps = {
+  /** Optional per-unit tone for color-coding rectangles on the floor plan. */
+  unitTone?: UnitToneMap;
+  /** Override the contents of the right-side / bottom-sheet info panel. */
+  renderUnitInfo?: (unit: Unit) => ReactNode;
+  /** Override the outer container className. Defaults to a full-viewport layout. */
+  className?: string;
+};
+
+export function SiteMap({
+  unitTone,
+  renderUnitInfo,
+  className = "relative h-[calc(100dvh-4rem)] w-full overflow-hidden",
+}: SiteMapProps = {}) {
   const [floor, setFloor] = useState<Floor>(1);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [listOpen, setListOpen] = useState(false);
@@ -29,8 +43,20 @@ export function SiteMap() {
     setListOpen(false);
   };
 
+  const navigate = (direction: -1 | 1) => {
+    if (!selectedId) return;
+    const idx = allUnits.findIndex((u) => u.id === selectedId);
+    if (idx < 0) return;
+    const next = allUnits[(idx + direction + allUnits.length) % allUnits.length];
+    handleSelect(next.id);
+  };
+
+  const selectedIndex = selectedId ? allUnits.findIndex((u) => u.id === selectedId) : -1;
+  const renderInfo = renderUnitInfo ?? ((u: Unit) => <UnitInfo unit={u} />);
+  const navLabel = selected ? `${selectedIndex + 1} / ${allUnits.length}` : "";
+
   return (
-    <div className="relative h-[calc(100dvh-4rem)] w-full overflow-hidden">
+    <div className={className}>
       {/* Desktop sidebar */}
       <aside className="absolute inset-y-0 left-0 z-10 hidden w-80 flex-col gap-3 border-r border-border bg-background p-3 md:flex">
         <FloorTabs floor={floor} onChange={setFloor} />
@@ -44,6 +70,7 @@ export function SiteMap() {
           floor={floor}
           selectedId={selectedId}
           onSelect={handleSelect}
+          unitTone={unitTone}
         />
       </div>
 
@@ -65,18 +92,14 @@ export function SiteMap() {
 
       {/* Desktop info panel — right-side sidebar */}
       {selected && isDesktop && (
-        <aside className="absolute inset-y-0 right-0 z-10 hidden w-96 flex-col overflow-y-auto border-l border-border bg-background p-5 md:flex">
-          <div className="flex items-start justify-between gap-2">
-            <UnitInfo unit={selected} />
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => setSelectedId(null)}
-              aria-label="Lukk"
-            >
-              <XIcon />
-            </Button>
-          </div>
+        <aside className="absolute inset-y-0 right-0 z-10 hidden w-96 flex-col gap-3 overflow-y-auto border-l border-border bg-background p-5 md:flex">
+          <PanelNav
+            label={navLabel}
+            onPrev={() => navigate(-1)}
+            onNext={() => navigate(1)}
+            onClose={() => setSelectedId(null)}
+          />
+          <div className="min-w-0 flex-1">{renderInfo(selected)}</div>
         </aside>
       )}
 
@@ -106,9 +129,48 @@ export function SiteMap() {
           <SheetHeader className="sr-only p-0">
             <SheetTitle>{selected ? `Leilighet ${selected.label}` : "Leilighet"}</SheetTitle>
           </SheetHeader>
-          <div className="overflow-y-auto">{selected && <UnitInfo unit={selected} />}</div>
+          {selected && (
+            <PanelNav label={navLabel} onPrev={() => navigate(-1)} onNext={() => navigate(1)} />
+          )}
+          <div className="overflow-y-auto pt-3">{selected && renderInfo(selected)}</div>
         </SheetContent>
       </Sheet>
+    </div>
+  );
+}
+
+function PanelNav({
+  label,
+  onPrev,
+  onNext,
+  onClose,
+}: {
+  label: string;
+  onPrev: () => void;
+  onNext: () => void;
+  onClose?: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center gap-1">
+        <Button variant="ghost" size="icon-sm" onClick={onPrev} aria-label="Forrige leilighet">
+          <ChevronLeftIcon />
+        </Button>
+        <span
+          className="min-w-12 text-center text-xs tabular-nums text-muted-foreground"
+          aria-live="polite"
+        >
+          {label}
+        </span>
+        <Button variant="ghost" size="icon-sm" onClick={onNext} aria-label="Neste leilighet">
+          <ChevronRightIcon />
+        </Button>
+      </div>
+      {onClose && (
+        <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Lukk">
+          <XIcon />
+        </Button>
+      )}
     </div>
   );
 }
