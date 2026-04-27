@@ -39,9 +39,8 @@ describe("RequireAuth", () => {
     const fetchMe = vi.fn().mockRejectedValue(new ApiError(401, null, "Missing token"));
     const navigate = vi.fn();
     renderWithAuth(<RequireAuth>Secret</RequireAuth>, { fetchMe, navigate });
-    const button = await screen.findByRole("button", { name: /logg inn/i });
-    await userEvent.click(button);
-    expect(navigate).toHaveBeenCalledWith(expect.stringContaining("/cdn-cgi/access/login"));
+    const button = await screen.findByRole("button", { name: /send engangskode/i });
+    expect(button).toBeInTheDocument();
   });
 
   test("shows forbidden screen on 403", async () => {
@@ -56,7 +55,7 @@ describe("RequireAuth", () => {
   test("network error treated as unauthenticated", async () => {
     const fetchMe = vi.fn().mockRejectedValue(new Error("net down"));
     renderWithAuth(<RequireAuth>Secret</RequireAuth>, { fetchMe });
-    expect(await screen.findByRole("button", { name: /logg inn/i })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /send engangskode/i })).toBeInTheDocument();
   });
 });
 

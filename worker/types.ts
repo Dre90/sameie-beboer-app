@@ -12,6 +12,10 @@ export type WorkerEnv = {
   DEV_BYPASS_AUTH?: string;
   /** Email to impersonate when DEV_BYPASS_AUTH=true. */
   DEV_USER_EMAIL?: string;
+  /** ES256 private key (PKCS8 PEM) used to sign Access External Evaluation responses. */
+  ACCESS_EVAL_PRIVATE_KEY?: string;
+  /** Key id for External Evaluation responses. Optional; defaults to "access-eval". */
+  ACCESS_EVAL_KEY_ID?: string;
 };
 
 export type UserRole = "board" | "craftsman";

@@ -35,7 +35,10 @@ type Props = {
   navigate?: (url: string) => void;
 };
 
-const defaultFetchMe = () => apiRequest<{ user: AuthUser }>("/api/me");
+const defaultFetchMe = () =>
+  apiRequest<{ user: AuthUser }>(`/api/me?t=${Date.now()}`, {
+    headers: { "Cache-Control": "no-cache" },
+  });
 const defaultNavigate = (url: string) => {
   window.location.href = url;
 };

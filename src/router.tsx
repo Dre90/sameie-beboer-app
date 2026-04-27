@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { AppShell } from "./AppShell";
+import { RouteErrorBoundary } from "./RouteErrorBoundary";
 import { RequireAuth, RequireRole } from "@/features/auth";
 import { SiteMap } from "@/features/map";
 import { ActivityDetail, Home } from "@/features/activities";
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
   {
     path: "/",
     Component: AppShell,
+    ErrorBoundary: RouteErrorBoundary,
     children: [
       {
         element: <RequireAuthOutlet />,

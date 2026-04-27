@@ -76,3 +76,43 @@ Brukeren må finnes i lokal D1 (kjør seed-kommandoen med `--local`).
 pnpm build
 pnpm dlx wrangler deploy
 ```
+
+## 8. (Anbefalt) Blokker ikke-registrerte før OTP — External Evaluation
+
+Som standard sender Access OTP til alle som skriver inn en e-post (policy
+"Everyone"); appen viser deretter "Ingen tilgang" hvis e-posten ikke ligger i
+`users`-tabellen. For å unngå at uregistrerte e-poster i det hele tatt får OTP,
+bruk Cloudflare Access **External Evaluation**:
+
+### 8.1 Generer ES256-nøkkelpar
+
+```powershell
+node scripts/generate-access-eval-keys.mjs
+```
+
+Du får ut en privat (PKCS8 PEM) og en offentlig (SPKI PEM) nøkkel.
+
+### 8.2 Sett privat nøkkel som worker-secret
+
+```powershell
+pnpm dlx wrangler secret put ACCESS_EVAL_PRIVATE_KEY
+# Lim inn hele PRIVATE KEY-blokken (inkl. -----BEGIN/END-----)
+```
+
+### 8.3 Konfigurer Access-policy
+
+I Zero Trust → Access → Applications → din app → Edit policy → **Add include**
+→ **External evaluation**:
+
+- **Evaluate URL**: `https://<din-worker>.workers.dev/api/access/external-eval`
+- **Keys URL**: la stå tom; lim inn **Public Key** (SPKI PEM-blokken) i feltet
+  for offentlig nøkkel.
+
+Lagre. Cloudflare kaller nå denne endepunktet før OTP sendes; bare e-poster som
+finnes i `users` slipper gjennom.
+
+### 8.4 Re-deploy
+
+```powershell
+pnpm dlx wrangler deploy
+```
