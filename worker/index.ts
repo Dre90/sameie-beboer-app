@@ -31,6 +31,17 @@ app.get("/api/me", requireAccessJwt(), loadUser(), (c) => {
   return c.json({ user: c.get("user") });
 });
 
+// Login redirect — protected path so Cloudflare Access starts the OTP flow,
+// then sends the user back to the SPA root.
+app.get("/api/login", requireAccessJwt(), (c) => {
+  return c.redirect("/");
+});
+
+// Logout — clear Access session cookie and redirect home.
+app.get("/api/logout", (c) => {
+  return c.redirect("/cdn-cgi/access/logout");
+});
+
 app.route("/api/users", usersRoute);
 app.route("/api/units", unitsRoute);
 app.route("/api/activities", activitiesRoute);

@@ -57,7 +57,7 @@ test("shows admin nav + logout when authenticated as board", async () => {
   expect(await screen.findByRole("link", { name: "Admin" })).toBeInTheDocument();
   expect(screen.getByLabelText("Innlogget som")).toHaveTextContent("Styret");
   await userEvent.click(screen.getByRole("button", { name: /logg ut/i }));
-  expect(navigate).toHaveBeenCalledWith("/cdn-cgi/access/logout");
+  expect(navigate).toHaveBeenCalledWith("/api/logout");
 });
 
 test("hides admin nav for craftsman", async () => {

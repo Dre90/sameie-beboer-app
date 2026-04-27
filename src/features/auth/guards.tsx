@@ -26,10 +26,11 @@ function UnauthenticatedScreen({ onLogin }: { onLogin: () => void }) {
     e.preventDefault();
     setBusy(true);
     setError(null);
+    const trimmed = email.trim().toLowerCase();
     try {
       const res = await apiRequest<{ registered: boolean }>("/api/auth/check", {
         method: "POST",
-        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+        body: JSON.stringify({ email: trimmed }),
       });
       if (res.registered) {
         onLogin();

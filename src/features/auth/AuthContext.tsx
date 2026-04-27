@@ -19,7 +19,7 @@ export type AuthState =
 type AuthContextValue = {
   state: AuthState;
   refresh: () => Promise<void>;
-  /** Triggers Cloudflare Access login by navigating to the Access login endpoint. */
+  /** Triggers Cloudflare Access login by navigating to the Access-protected login endpoint. */
   login: () => void;
   /** Triggers Cloudflare Access logout by navigating to the logout endpoint. */
   logout: () => void;
@@ -79,13 +79,13 @@ export function AuthProvider({
     () => ({
       state,
       refresh,
-      login: () =>
-        navigate(
-          `/cdn-cgi/access/login?redirect_url=${encodeURIComponent(
-            window.location.pathname + window.location.search,
-          )}`,
-        ),
-      logout: () => navigate("/cdn-cgi/access/logout"),
+      login: () => {
+        // Navigate to /api/login which is covered by the Access app — Access
+        // intercepts the request and redirects to the team-domain OTP page.
+        // (Cloudflare Access has no documented way to prefill the email.)
+        navigate("/api/login");
+      },
+      logout: () => navigate("/api/logout"),
     }),
     [state, refresh, navigate],
   );

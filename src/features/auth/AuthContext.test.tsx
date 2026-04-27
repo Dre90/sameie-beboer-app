@@ -49,7 +49,7 @@ describe("RequireAuth", () => {
     renderWithAuth(<RequireAuth>Secret</RequireAuth>, { fetchMe, navigate });
     expect(await screen.findByText(/kontakt styret/i)).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: /logg ut/i }));
-    expect(navigate).toHaveBeenCalledWith("/cdn-cgi/access/logout");
+    expect(navigate).toHaveBeenCalledWith("/api/logout");
   });
 
   test("network error treated as unauthenticated", async () => {
