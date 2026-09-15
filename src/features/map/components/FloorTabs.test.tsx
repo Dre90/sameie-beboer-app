@@ -13,5 +13,6 @@ test("clicking a tab calls onChange with the numeric floor", async () => {
 
 test("selected tab reflects the floor prop", () => {
   render(<FloorTabs floor={2} onChange={() => {}} />);
+  expect(screen.getByRole("tablist", { name: "Velg etasje" })).toBeInTheDocument();
   expect(screen.getByRole("tab", { name: "2. etg" })).toHaveAttribute("aria-selected", "true");
 });

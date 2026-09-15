@@ -17,10 +17,9 @@ export function FloorTabs({
     <Tabs
       value={String(floor)}
       onValueChange={(value) => onChange(Number(value) as Floor)}
-      aria-label="Velg etasje"
       className={className}
     >
-      <TabsList className="w-full">
+      <TabsList className="w-full" aria-label="Velg etasje">
         {floors.map((f) => (
           <TabsTrigger key={f} value={String(f)}>
             {f}. etg

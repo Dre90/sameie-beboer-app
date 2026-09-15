@@ -24,9 +24,14 @@ coverage
 *.sln
 *.sw?
 
-# Cloudflare / Wrangler
-.wrangler
+# Local platform state and environment
+.netlify
+/deno.lock
+.env
+.env.*
+!.env.example
 .dev.vars
+.wrangler
 
 # Local secrets (generated keys, etc.)
 .secrets/

@@ -1,9 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { RouterProvider } from "react-router-dom";
 import "./style.css";
-import { router } from "./router";
-import { AuthProvider } from "@/features/auth";
+import { App } from "./App";
 
 const rootEl = document.querySelector<HTMLDivElement>("#app");
 if (!rootEl) {
@@ -12,8 +10,6 @@ if (!rootEl) {
 
 createRoot(rootEl).render(
   <StrictMode>
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
+    <App />
   </StrictMode>,
 );

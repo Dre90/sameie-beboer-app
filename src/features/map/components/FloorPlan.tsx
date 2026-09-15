@@ -1,5 +1,6 @@
 import { type UnitGeometry, VIEW_BOX } from "../data/geometry";
-import { getTone, type UnitToneMap } from "../lib/tone";
+import { getTone, type UnitTone, type UnitToneMap } from "../lib/tone";
+import { cn } from "@/lib/utils";
 
 type Props = {
   geometry: UnitGeometry;
@@ -9,12 +10,21 @@ type Props = {
   unitTone?: UnitToneMap;
 };
 
+const toneLabels: Record<UnitTone, string> = {
+  neutral: "Status ikke tilgjengelig",
+  unanswered: "Mangler svar",
+  home: "Hjemme",
+  consent: "Samtykke",
+  self_service: "Gjør selv",
+  done: "Fullført eller levert",
+};
+
 export function FloorPlan({ geometry, selectedId, onSelect, floor, unitTone }: Props) {
   return (
     <svg
       viewBox={`0 0 ${VIEW_BOX.width} ${VIEW_BOX.height}`}
       className="h-full w-full"
-      role="img"
+      role="group"
       aria-label={`Etasjeplan ${floor}. etasje`}
     >
       <defs>
@@ -50,18 +60,41 @@ export function FloorPlan({ geometry, selectedId, onSelect, floor, unitTone }: P
               height={rect.h}
               rx={4}
               onClick={() => onSelect(id)}
+              role="button"
+              tabIndex={0}
+              aria-label={`Leilighet ${id}, ${toneLabels[tone]}`}
+              aria-pressed={isSelected}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  if (!event.repeat) onSelect(id);
+                }
+              }}
               data-selected={isSelected}
               data-townhouse={isTownhouse}
               data-tone={tone}
-              className="cursor-pointer stroke-border transition-colors fill-secondary hover:fill-primary/25 hover:stroke-primary data-[tone=done]:fill-map-done data-[tone=home]:fill-map-home data-[tone=consent]:fill-map-consent data-[tone=self_service]:fill-map-self-service data-[tone=unanswered]:fill-[url(#map-unanswered-stripes)] data-[tone=unanswered]:stroke-map-unanswered data-[selected=true]:fill-primary data-[selected=true]:stroke-primary"
-              strokeWidth={1.5}
-            />
+              className={cn(
+                "cursor-pointer fill-secondary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[tone=done]:fill-map-done data-[tone=home]:fill-map-home data-[tone=consent]:fill-map-consent data-[tone=unanswered]:fill-[url(#map-unanswered-stripes)]",
+                tone === "self_service" && "fill-map-self-service",
+                isSelected
+                  ? "stroke-foreground"
+                  : "stroke-border hover:stroke-primary data-[tone=unanswered]:stroke-map-unanswered",
+              )}
+              strokeWidth={isSelected ? 4 : 1.5}
+              vectorEffect="non-scaling-stroke"
+            >
+              <title>{`${id}: ${toneLabels[tone]}`}</title>
+            </rect>
             <text
               x={rect.x + rect.w / 2}
               y={rect.y + rect.h / 2}
               textAnchor="middle"
               dominantBaseline="central"
-              className="pointer-events-none select-none fill-foreground text-[18px] font-semibold data-[selected=true]:fill-primary-foreground"
+              aria-hidden="true"
+              className="pointer-events-none select-none fill-foreground stroke-background text-[18px] font-semibold"
+              strokeWidth={5}
+              strokeLinejoin="round"
+              paintOrder="stroke"
               data-selected={isSelected}
             >
               {id}

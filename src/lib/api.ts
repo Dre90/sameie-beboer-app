@@ -26,10 +26,17 @@ export async function apiRequest<T = unknown>(path: string, init: RequestInit = 
     headers.set("Content-Type", "application/json");
   }
   headers.set("Accept", "application/json");
-  const res = await getFetch()(path, { ...init, headers, credentials: "include" });
+  const res = await getFetch()(path, {
+    ...init,
+    headers,
+    credentials: "include",
+  });
   const text = await res.text();
   const body = text ? safeJson(text) : null;
   if (!res.ok) {
+    if (res.status === 401 && path !== "/api/login" && typeof window !== "undefined") {
+      window.dispatchEvent(new Event("session-expired"));
+    }
     const message =
       (body && typeof body === "object" && "error" in body && typeof body.error === "string"
         ? body.error

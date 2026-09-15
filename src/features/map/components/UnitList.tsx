@@ -54,9 +54,9 @@ export function UnitList({
           if (items.length === 0) return null;
           return (
             <section key={b} className="flex flex-col gap-2">
-              <h3 className="px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              <h2 className="px-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
                 {buildingLabels[b]}
-              </h3>
+              </h2>
               <ul className="grid grid-cols-3 gap-1.5">
                 {items.map((u) => {
                   const onCurrentFloor =
@@ -66,14 +66,19 @@ export function UnitList({
                     <li key={u.id}>
                       <Button
                         variant={isSelected ? "default" : "outline"}
-                        size="sm"
+                        size="lg"
                         onClick={() => onSelect(u.id)}
                         aria-pressed={isSelected}
+                        title={
+                          u.building === "C"
+                            ? `${u.label}, rekkehus`
+                            : `${u.label}, ${u.floor}. etasje`
+                        }
                         className={cn(
                           "w-full",
                           !isSelected &&
                             "hover:border-primary hover:bg-primary/15 hover:text-foreground",
-                          !onCurrentFloor && "opacity-50",
+                          !onCurrentFloor && "border-dashed",
                         )}
                       >
                         {u.label}

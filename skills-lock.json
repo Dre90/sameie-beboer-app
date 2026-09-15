@@ -1,6 +1,24 @@
 {
   "version": 1,
   "skills": {
+    "netlify-database": {
+      "source": "netlify/context-and-tools",
+      "sourceType": "github",
+      "skillPath": "skills/netlify-database/SKILL.md",
+      "computedHash": "a06b8801db49aae94fda2c559d5c28e897b73fec89c1f924e3ae307f1646a4dd"
+    },
+    "netlify-deploy": {
+      "source": "netlify/context-and-tools",
+      "sourceType": "github",
+      "skillPath": "skills/netlify-deploy/SKILL.md",
+      "computedHash": "22b41fbde33d8b9bdd695b1ee9d7e8a4811f0b8ba83293927a24a398a72c785f"
+    },
+    "netlify-functions": {
+      "source": "netlify/context-and-tools",
+      "sourceType": "github",
+      "skillPath": "skills/netlify-functions/SKILL.md",
+      "computedHash": "1eebe1c89cc12f29c7c11029bae614399fb38d825b9e074a1786d97fd949d5c0"
+    },
     "shadcn": {
       "source": "shadcn/ui",
       "sourceType": "github",

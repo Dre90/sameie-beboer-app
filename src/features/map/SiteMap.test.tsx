@@ -1,26 +1,7 @@
 import { expect, test, vi } from "vite-plus/test";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SiteMap } from "./SiteMap";
-
-vi.mock("@/lib/api-client", () => ({
-  api: {
-    units: {
-      get: vi.fn().mockResolvedValue({
-        unit: {
-          id: "X",
-          is_rented: false,
-          owner_name: null,
-          owner_email: null,
-          owner_phone: null,
-          updated_at: "",
-          residents: [],
-        },
-        residents: [],
-      }),
-    },
-  },
-}));
 
 test("renders floor tabs and unit list", () => {
   render(<SiteMap />);
@@ -30,6 +11,9 @@ test("renders floor tabs and unit list", () => {
   expect(screen.getAllByRole("button", { name: "A11" }).length).toBeGreaterThan(0);
   expect(screen.getAllByRole("button", { name: "B36" }).length).toBeGreaterThan(0);
   expect(screen.getAllByRole("button", { name: "C1" }).length).toBeGreaterThan(0);
+  expect(
+    screen.getByRole("group", { name: "Etasjeplan 1. etasje" }).closest(".top-18"),
+  ).toHaveClass("xl:top-0");
 });
 
 test("selecting unit from list opens info panel", async () => {
@@ -63,6 +47,8 @@ test("opening the mobile list button exposes the list sheet", async () => {
   await user.click(screen.getByRole("button", { name: "Åpne liste" }));
   expect(await screen.findByRole("dialog")).toBeInTheDocument();
   expect(screen.getByRole("heading", { name: "Leiligheter" })).toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: "Lukk" }));
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });
 
 test("selecting a townhouse shows the rekkehus label", async () => {
@@ -70,6 +56,21 @@ test("selecting a townhouse shows the rekkehus label", async () => {
   render(<SiteMap />);
   await user.click(screen.getAllByRole("button", { name: "C3" })[0]);
   expect(screen.getByText("Rekkehus C (alle etasjer)")).toBeInTheDocument();
+});
+
+test("returns focus to the list menu after closing mobile details", async () => {
+  const user = userEvent.setup();
+  render(<SiteMap />);
+  const menu = screen.getByRole("button", { name: "Åpne liste" });
+  await user.click(menu);
+  await user.click(
+    within(screen.getByRole("dialog", { name: "Leiligheter" })).getByRole("button", {
+      name: "A11",
+    }),
+  );
+  const details = await screen.findByRole("dialog", { name: "Leilighet A11" });
+  await user.click(within(details).getByRole("button", { name: "Lukk" }));
+  await waitFor(() => expect(menu).toHaveFocus());
 });
 
 test("renderUnitInfo overrides the default info panel", async () => {
@@ -89,11 +90,49 @@ test("unitTone applies data-tone to map rectangles", () => {
   expect(rect).not.toBeNull();
 });
 
+test("opens the tablet list on demand and keeps selection in a compact side panel", async () => {
+  const original = window.matchMedia;
+  const media = vi.spyOn(window, "matchMedia").mockImplementation((query) => {
+    const result = original(query);
+    Object.defineProperty(result, "matches", { value: query === "(min-width: 768px)" });
+    return result;
+  });
+  try {
+    const user = userEvent.setup();
+    render(<SiteMap />);
+    const list = screen.getByRole("complementary", { name: "Leilighetsliste" });
+    expect(list).toHaveClass("hidden", "xl:flex", "w-72");
+    expect(list).not.toHaveClass("md:flex");
+
+    await user.click(screen.getByRole("button", { name: "Åpne liste" }));
+    const dialog = await screen.findByRole("dialog", { name: "Leiligheter" });
+    await user.click(within(dialog).getByRole("button", { name: "B31" }));
+    const details = screen.getByRole("complementary", { name: "Leilighetsdetaljer" });
+    expect(details).toHaveClass("w-80");
+    expect(within(details).getByRole("heading", { name: "B31" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Etasjeplan 3. etasje" })).toBeInTheDocument();
+    await user.click(within(details).getByRole("button", { name: "Neste leilighet" }));
+    expect(within(details).getByRole("heading", { name: "B32" })).toBeInTheDocument();
+    await user.click(within(details).getByRole("button", { name: "Lukk" }));
+    expect(
+      screen.queryByRole("complementary", { name: "Leilighetsdetaljer" }),
+    ).not.toBeInTheDocument();
+  } finally {
+    media.mockRestore();
+  }
+});
+
 test("prev/next buttons navigate between units in the info panel", async () => {
   const user = userEvent.setup();
   render(<SiteMap renderUnitInfo={(unit) => <p data-testid="panel-label">{unit.label}</p>} />);
   await user.click(screen.getAllByRole("button", { name: "A11" })[0]);
   expect(await screen.findByTestId("panel-label")).toHaveTextContent("A11");
+
+  for (const name of ["Forrige leilighet", "Neste leilighet"]) {
+    const button = screen.getByRole("button", { name });
+    expect(button).toHaveClass("size-10", "border-border", "bg-background", "shadow-sm");
+    expect(button).toHaveAttribute("title", name);
+  }
 
   await user.click(screen.getByRole("button", { name: "Neste leilighet" }));
   expect(screen.getByTestId("panel-label")).toHaveTextContent("A12");

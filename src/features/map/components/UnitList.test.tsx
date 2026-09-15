@@ -12,12 +12,13 @@ test("shows empty state when no units match search", async () => {
   expect(screen.getByText("Ingen treff")).toBeInTheDocument();
 });
 
-test("dims units that are not on the current floor", () => {
+test("distinguishes other floors without reducing text contrast", () => {
   render(<UnitList selectedId={null} onSelect={noop} currentFloor={1} />);
-  // B31 is on floor 3, so it should be dimmed when currentFloor=1
-  expect(screen.getByRole("button", { name: "B31" })).toHaveClass("opacity-50");
-  // A11 is on floor 1, so it should not be dimmed
+  expect(screen.getByRole("button", { name: "B31" })).toHaveClass("border-dashed");
+  expect(screen.getByRole("button", { name: "B31" })).not.toHaveClass("opacity-50");
+  expect(screen.getByRole("button", { name: "B31" })).toHaveAttribute("title", "B31, 3. etasje");
   expect(screen.getByRole("button", { name: "A11" })).not.toHaveClass("opacity-50");
+  expect(screen.getByRole("heading", { name: "Bygg A", level: 2 })).toBeInTheDocument();
 });
 
 test("marks the selected unit as pressed", () => {

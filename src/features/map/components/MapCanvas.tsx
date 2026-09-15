@@ -82,7 +82,7 @@ function useStepZoom() {
         width,
         height,
       );
-      setTransform(x, y, scale, 200, "easeOut");
+      void setTransform(x, y, scale, 200, "easeOut");
     },
     [ctx, setTransform],
   );
@@ -131,10 +131,11 @@ function ZoomControls() {
     <div
       className="absolute right-3 bottom-3 z-10 flex flex-col items-center gap-1 rounded-2xl border border-border bg-card/95 p-1 shadow-md backdrop-blur"
       aria-label="Zoom-kontroller"
+      role="group"
     >
       <Button
         variant="ghost"
-        size="icon"
+        size="icon-lg"
         onClick={() => stepZoom(1)}
         disabled={atMax}
         aria-label="Zoom inn"
@@ -149,7 +150,7 @@ function ZoomControls() {
       </div>
       <Button
         variant="ghost"
-        size="icon"
+        size="icon-lg"
         onClick={() => stepZoom(-1)}
         disabled={atMin}
         aria-label="Zoom ut"
@@ -158,7 +159,7 @@ function ZoomControls() {
       </Button>
       <Button
         variant="ghost"
-        size="icon"
+        size="icon-lg"
         onClick={() => resetTransform()}
         aria-label="Tilbakestill zoom"
       >

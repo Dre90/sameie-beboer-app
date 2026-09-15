@@ -4,10 +4,11 @@
     "module": "esnext",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "types": [
-      "vite/client",
+      "vite-plus/client",
       "vite-plus/test/globals",
       "@testing-library/jest-dom",
-      "@cloudflare/workers-types"
+      "node",
+      "@netlify/functions"
     ],
     "skipLibCheck": true,
 
@@ -33,5 +34,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "worker"]
+  "include": ["src", "server", "netlify/functions", "scripts"]
 }

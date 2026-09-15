@@ -1,5 +1,4 @@
 import { type Unit } from "../data/units";
-import { UnitContactInfo } from "./UnitContactInfo";
 
 const buildingLabels = {
   A: "Bygg A",
@@ -19,7 +18,6 @@ export function UnitInfo({ unit }: { unit: Unit }) {
         <h2 className="font-heading text-2xl font-medium text-foreground">{unit.label}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{location}</p>
       </div>
-      <UnitContactInfo unitId={unit.id} />
     </div>
   );
 }

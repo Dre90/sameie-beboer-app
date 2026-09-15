@@ -11,7 +11,7 @@ test("renders zoom controls at 100%", () => {
   expect(screen.getByRole("button", { name: "Zoom inn" })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Zoom ut" })).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Tilbakestill zoom" })).toBeInTheDocument();
-  expect(screen.getByLabelText("Zoom-kontroller")).toHaveTextContent("100%");
+  expect(screen.getByRole("group", { name: "Zoom-kontroller" })).toHaveTextContent("100%");
 });
 
 test("clicking zoom-in button steps to 125%", async () => {

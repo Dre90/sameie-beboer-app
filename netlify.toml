@@ -1,0 +1,38 @@
+[build]
+command = "vp build"
+publish = "dist"
+
+[build.environment]
+NODE_VERSION = "24"
+
+[context.dev]
+publish = "public"
+
+[functions]
+directory = "netlify/functions"
+node_bundler = "esbuild"
+
+[dev]
+command = "vp dev --host 127.0.0.1"
+publish = "public"
+targetPort = 5173
+port = 8888
+framework = "#custom"
+autoLaunch = false
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+
+[[headers]]
+for = "/*"
+[headers.values]
+X-Content-Type-Options = "nosniff"
+Referrer-Policy = "no-referrer"
+X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+for = "/index.html"
+[headers.values]
+Cache-Control = "no-cache"

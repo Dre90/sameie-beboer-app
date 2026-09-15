@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { ChevronLeftIcon, ChevronRightIcon, MenuIcon, XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { FloorTabs } from "./components/FloorTabs";
 import { MapCanvas } from "./components/MapCanvas";
@@ -58,13 +59,21 @@ export function SiteMap({
   return (
     <div className={className}>
       {/* Desktop sidebar */}
-      <aside className="absolute inset-y-0 left-0 z-10 hidden w-80 flex-col gap-3 border-r border-border bg-background p-3 md:flex">
+      <aside
+        aria-label="Leilighetsliste"
+        className="absolute inset-y-0 left-0 z-10 hidden w-72 flex-col gap-3 border-r border-border bg-background p-3 xl:flex"
+      >
         <FloorTabs floor={floor} onChange={setFloor} />
         <UnitList selectedId={selectedId} onSelect={handleSelect} currentFloor={floor} />
       </aside>
 
       {/* Map */}
-      <div className={`absolute inset-0 md:left-80 ${selected && isDesktop ? "md:right-96" : ""}`}>
+      <div
+        className={cn(
+          "absolute inset-0 top-18 xl:top-0 xl:left-72",
+          selected && isDesktop && "md:right-80",
+        )}
+      >
         <MapCanvas
           geometry={geometryByFloor[floor]}
           floor={floor}
@@ -75,24 +84,33 @@ export function SiteMap({
       </div>
 
       {/* Mobile floating top bar */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start gap-2 p-3 md:hidden">
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start gap-2 p-3 xl:hidden",
+          selected && isDesktop && "md:right-80",
+        )}
+      >
         <Button
           variant="outline"
-          size="icon"
+          size="icon-lg"
           onClick={() => setListOpen(true)}
           aria-label="Åpne liste"
+          title="Åpne leilighetsliste"
           className="pointer-events-auto bg-background/90 backdrop-blur"
         >
           <MenuIcon />
         </Button>
-        <div className="pointer-events-auto flex-1 rounded-full border border-border bg-background/90 shadow-sm backdrop-blur">
+        <div className="pointer-events-auto max-w-sm flex-1 rounded-full border border-border bg-background/90 shadow-sm backdrop-blur">
           <FloorTabs floor={floor} onChange={setFloor} />
         </div>
       </div>
 
       {/* Desktop info panel — right-side sidebar */}
       {selected && isDesktop && (
-        <aside className="absolute inset-y-0 right-0 z-10 hidden w-96 flex-col gap-3 overflow-y-auto border-l border-border bg-background p-5 md:flex">
+        <aside
+          aria-label="Leilighetsdetaljer"
+          className="absolute inset-y-0 right-0 z-10 hidden w-80 flex-col gap-3 overflow-y-auto border-l border-border bg-background p-5 md:flex"
+        >
           <PanelNav
             label={navLabel}
             onPrev={() => navigate(-1)}
@@ -152,22 +170,36 @@ function PanelNav({
 }) {
   return (
     <div className="flex items-center justify-between gap-2">
-      <div className="flex items-center gap-1">
-        <Button variant="ghost" size="icon-sm" onClick={onPrev} aria-label="Forrige leilighet">
-          <ChevronLeftIcon />
+      <div className="flex items-center gap-3">
+        <Button
+          variant="outline"
+          size="icon-lg"
+          className="shadow-sm"
+          onClick={onPrev}
+          aria-label="Forrige leilighet"
+          title="Forrige leilighet"
+        >
+          <ChevronLeftIcon strokeWidth={3} />
         </Button>
         <span
-          className="min-w-12 text-center text-xs tabular-nums text-muted-foreground"
+          className="min-w-12 text-center text-sm tabular-nums text-muted-foreground"
           aria-live="polite"
         >
           {label}
         </span>
-        <Button variant="ghost" size="icon-sm" onClick={onNext} aria-label="Neste leilighet">
-          <ChevronRightIcon />
+        <Button
+          variant="outline"
+          size="icon-lg"
+          className="shadow-sm"
+          onClick={onNext}
+          aria-label="Neste leilighet"
+          title="Neste leilighet"
+        >
+          <ChevronRightIcon strokeWidth={3} />
         </Button>
       </div>
       {onClose && (
-        <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Lukk">
+        <Button variant="ghost" size="icon-lg" onClick={onClose} aria-label="Lukk">
           <XIcon />
         </Button>
       )}
