@@ -4,7 +4,7 @@ Instructions for AI agents working in this repository.
 
 ## Project overview
 
-`sameie-beboer-app` tracks one filter-change day for 47 units at Saksvik Øvre. There is no people register. Board edits resident responses; both board and craftsman update separate completion statuses. Stack:
+`sameie-beboer-app` tracks one filter-change day for 47 units at Saksvik Øvre. There is no people register. Board edits resident responses; both board and craftsman update separate completion statuses. Each role also writes its own short comment per unit (`board_comment` / `craftsman_comment`, max 500 characters, practical info only); the board may clear, but not edit, the craftsman's message. Stack:
 
 - **React 19** + **TypeScript** (strict, `jsx: react-jsx`)
 - **Tailwind CSS v4** via `@tailwindcss/vite` (imported in `src/style.css`)

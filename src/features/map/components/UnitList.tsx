@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
+import { MessageSquareTextIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Empty, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { allUnits } from "../data/units";
+import { allUnits, isLargeUnit } from "../data/units";
 
 type Floor = 1 | 2 | 3;
 
@@ -17,10 +18,12 @@ export function UnitList({
   selectedId,
   onSelect,
   currentFloor,
+  commentedUnitIds,
 }: {
   selectedId: string | null;
   onSelect: (id: string) => void;
   currentFloor: Floor;
+  commentedUnitIds?: ReadonlySet<string>;
 }) {
   const [query, setQuery] = useState("");
 
@@ -82,6 +85,13 @@ export function UnitList({
                         )}
                       >
                         {u.label}
+                        {isLargeUnit(u.id) && <span className="sr-only">, stor leilighet</span>}
+                        {commentedUnitIds?.has(u.id) && (
+                          <>
+                            <MessageSquareTextIcon data-icon="inline-end" aria-hidden="true" />
+                            <span className="sr-only">, har kommentar</span>
+                          </>
+                        )}
                       </Button>
                     </li>
                   );

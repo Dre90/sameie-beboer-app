@@ -44,3 +44,23 @@ export const buildingC: Townhouse[] = range(1, 7).map((n) => ({
 export const allUnits: Unit[] = [...buildingA, ...buildingB, ...buildingC];
 
 export const unitsById = new Map<string, Unit>(allUnits.map((u) => [u.id, u]));
+
+// Large apartments need a different filter size, so the craftsman must know them in advance.
+export const largeUnitIds: ReadonlySet<string> = new Set([
+  "B16",
+  "B17",
+  "B18",
+  "B19",
+  "B25",
+  "B26",
+  "B27",
+  "B28",
+  "B31",
+  "B32",
+  "B33",
+  "B34",
+  "B35",
+  "B36",
+]);
+
+export const isLargeUnit = (id: string) => largeUnitIds.has(id);

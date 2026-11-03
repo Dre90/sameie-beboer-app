@@ -1,6 +1,7 @@
 import { getDatabase } from "@netlify/database";
-import type { Role, UnitStatus } from "../src/lib/filter-types";
+import type { Role, UnitField, UnitStatus } from "../src/lib/filter-types";
 
+type Database = ReturnType<typeof getDatabase>;
 type Session = { role: Role; credential_version: string; expires_at: Date };
 type StoredUnit = Omit<UnitStatus, "updated_at"> & { updated_at: Date };
 
@@ -8,20 +9,44 @@ function serializeUnit(unit: StoredUnit): UnitStatus {
   return { ...unit, updated_at: unit.updated_at.toISOString() };
 }
 
-export function createStore(database: ReturnType<typeof getDatabase>) {
+// One explicit statement per column, so no identifier is ever built from request data.
+function updateField(
+  database: Database,
+  id: string,
+  field: UnitField,
+  value: string,
+  version: number,
+) {
+  switch (field) {
+    case "response":
+      return database.sql<StoredUnit>`UPDATE unit_status SET response = ${value}, version = version + 1, updated_at = now()
+        WHERE id = ${id} AND version = ${version}
+        RETURNING id, response, completion, board_comment, craftsman_comment, version, updated_at`;
+    case "completion":
+      return database.sql<StoredUnit>`UPDATE unit_status SET completion = ${value}, version = version + 1, updated_at = now()
+        WHERE id = ${id} AND version = ${version}
+        RETURNING id, response, completion, board_comment, craftsman_comment, version, updated_at`;
+    case "board_comment":
+      return database.sql<StoredUnit>`UPDATE unit_status SET board_comment = ${value}, version = version + 1, updated_at = now()
+        WHERE id = ${id} AND version = ${version}
+        RETURNING id, response, completion, board_comment, craftsman_comment, version, updated_at`;
+    case "craftsman_comment":
+      return database.sql<StoredUnit>`UPDATE unit_status SET craftsman_comment = ${value}, version = version + 1, updated_at = now()
+        WHERE id = ${id} AND version = ${version}
+        RETURNING id, response, completion, board_comment, craftsman_comment, version, updated_at`;
+  }
+}
+
+export function createStore(database: Database) {
   return {
     async list(): Promise<UnitStatus[]> {
       const units =
-        await database.sql<StoredUnit>`SELECT id, response, completion, version, updated_at FROM unit_status ORDER BY id`;
+        await database.sql<StoredUnit>`SELECT id, response, completion, board_comment, craftsman_comment, version, updated_at
+        FROM unit_status ORDER BY id`;
       return units.map(serializeUnit);
     },
-    async update(id: string, field: "response" | "completion", value: string, version: number) {
-      const rows =
-        field === "response"
-          ? await database.sql<StoredUnit>`UPDATE unit_status SET response = ${value}, version = version + 1, updated_at = now()
-            WHERE id = ${id} AND version = ${version} RETURNING id, response, completion, version, updated_at`
-          : await database.sql<StoredUnit>`UPDATE unit_status SET completion = ${value}, version = version + 1, updated_at = now()
-            WHERE id = ${id} AND version = ${version} RETURNING id, response, completion, version, updated_at`;
+    async update(id: string, field: UnitField, value: string, version: number) {
+      const rows = await updateField(database, id, field, value, version);
       return rows[0] ? serializeUnit(rows[0]) : null;
     },
     async createSession(tokenHash: string, role: Role, credentialVersion: string, expires: Date) {

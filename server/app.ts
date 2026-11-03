@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { getCookie, setCookie } from "hono/cookie";
 import { stringify } from "csv-stringify/sync";
-import { completionLabels, responseLabels } from "../src/lib/filter-types";
+import { completionLabels, isCommentField, responseLabels } from "../src/lib/filter-types";
 import type { Role } from "../src/lib/filter-types";
 import { digest, verifyPassword } from "./password";
 import type { Store } from "./store";
@@ -158,6 +158,8 @@ app.get("/api/export", async (context) => {
       Beboersvar: responseLabels[unit.response],
       Utførelse: completionLabels[unit.completion],
       SistEndret: unit.updated_at,
+      KommentarStyret: unit.board_comment,
+      BeskjedHåndverker: unit.craftsman_comment,
     })),
     { header: true, bom: true, delimiter: ";", escape_formulas: true },
   );
@@ -168,12 +170,18 @@ app.get("/api/export", async (context) => {
 
 app.patch("/api/units/:id/:field", async (context) => {
   const field = context.req.param("field");
-  if (field !== "response" && field !== "completion") {
+  if (field !== "response" && field !== "completion" && !isCommentField(field)) {
     throw new HTTPException(404, { message: "Ukjent handling" });
   }
-  if (field === "response" && context.get("role") !== "board") {
+  const role = context.get("role");
+  if (field === "response" && role !== "board") {
     throw new HTTPException(403, {
       message: "Bare styret kan endre beboersvar",
+    });
+  }
+  if (field === "board_comment" && role !== "board") {
+    throw new HTTPException(403, {
+      message: "Bare styret kan skrive styrets kommentar",
     });
   }
   const body = await readBody(context.req.raw);
@@ -182,7 +190,14 @@ app.patch("/api/units/:id/:field", async (context) => {
     update = validateUpdate(context.req.param("id"), field, body);
   } catch {
     throw new HTTPException(400, {
-      message: "Ugyldig leilighet, status eller versjon",
+      message: isCommentField(field)
+        ? "Ugyldig leilighet, kommentar eller versjon"
+        : "Ugyldig leilighet, status eller versjon",
+    });
+  }
+  if (field === "craftsman_comment" && role === "board" && update.value !== "") {
+    throw new HTTPException(403, {
+      message: "Styret kan bare tømme håndverkerens beskjed",
     });
   }
   const unit = await context.env.store.update(

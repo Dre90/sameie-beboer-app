@@ -2,7 +2,11 @@
 
 Kart og arbeidsoversikt for én filterbyttedag, med 47 leiligheter. React 19, TypeScript, Tailwind og shadcn/Base UI på frontend. Vanlige Netlify Functions med Hono og Netlify Database (Postgres) på serveren. Verktøykjeden er Vite+ (`vp`).
 
-Ingen personregister, fritekst, e-post eller telefon. Beboersvar og utførelse er separate felt. Styret endrer svar og eksporterer reserveoversikt. Begge roller kan markere utført/levert og angre med bekreftelse. Dette er ikke en adgangskontroll: markeringen «Samtykke» er ikke i seg selv dokumentasjon på tillatelse til å gå inn.
+Ingen personregister, e-post eller telefon. Beboersvar og utførelse er separate felt. Styret endrer svar og eksporterer reserveoversikt. Begge roller kan markere utført/levert og angre med bekreftelse. Dette er ikke en adgangskontroll: markeringen «Samtykke» er ikke i seg selv dokumentasjon på tillatelse til å gå inn.
+
+Hver leilighet har to kommentarfelt på maks 500 tegn. Styret skriver «Kommentar fra styret», og håndverkeren skriver «Beskjed til styret». Hver rolle endrer bare sitt eget felt og ser det andre som lesetekst. Styret kan tømme håndverkerens beskjed etter bekreftelse, men ikke endre den. Feltene er appens eneste fritekst og skal bare brukes til praktisk info, for eksempel «Hund i bur». Ikke skriv navn, telefonnummer, helseopplysninger eller samtykkedokumentasjon der. Leiligheter med kommentar har en prikk i kartet og et ikon i lista.
+
+Store leiligheter (B16–B19, B25–B28 og B31–B36) er tegnet større i kartet, så håndverkeren kan ta med riktig filter. B-blokka og rekkehusene slutter på samme høyrekant, som i oversiktsplanen.
 
 ## Lokal utvikling
 
@@ -43,8 +47,9 @@ Dette er lokale kommandoer, ikke publisering. Tester bruker isolerte lokale data
 Teknisk gjennomgang 15. september 2026, med axe-core i Chromium, komponenttester og manuell kontroll av DOM, kontrast og layout. Dette er ikke en full WCAG-sertifisering.
 
 - Valgt kartleilighet markeres med en kontrasterende kant som beholder tykkelsen ved zoom. Statusfargen beholdes og oppdateres også mens leiligheten er valgt. Tekstkontur skjermer alle etiketter fra stripemønster og statusfarger.
-- Kartleiligheter har tastaturfokus, Enter/mellomrom, opplest leilighetsnummer/status og valgt-tilstand. Listen er et alternativ til presise trykk i kartet; status finnes også som tekst i detaljpanelet.
+- Kartleiligheter har tastaturfokus, Enter/mellomrom, opplest leilighetsnummer/status og valgt-tilstand. Store leiligheter og leiligheter med kommentar leses også opp som «stor leilighet» og «har kommentar». Listen er et alternativ til presise trykk i kartet; status finnes også som tekst i detaljpanelet.
 - Andre etasjer markeres med stiplet kant, ikke lav tekstkontrast. Primærknapper og feilmeldinger beholder kontrast ved hover og feil.
+- Knapper med kant, statusmerker, svarvalg og tekstfelt har kant med minst 3:1 kontrast (tokenet `--control-border`) i lyst og mørkt tema. Valgt svar fylles med primærfargen, også ved hover. I mørkt tema får valgt svar i tillegg en lys kant, fordi primærfargen alene er under 3:1 mot bakgrunnen.
 - Fokusmarkering, norske lukkenavn, navngitte fanelister/zoomgrupper, overskrifter og hovedområde er kontrollert. Mobilens liste-til-detaljflyt har test for fokusretur ved lukking.
 - Axe fant ingen gjenværende automatiske brudd i de sjekkede visningene: innlogging, tilkoblingsfeil, oversikt/detaljer på desktop, nettbrett og mobil, samt ferdigrendret mørkt tema. Begge roller er også dekket av komponentbaserte axe-tester.
 - 320 px mobilbredde og 200 % tekststørrelse er kontrollert uten horisontal overflyt eller klipping av knappetekst i de sjekkede tilstandene.
@@ -92,17 +97,17 @@ Deploy previews kan inneholde en kopi av produksjonsdata. Bruk separate testpass
 
 - Del rollepassord kun med rette mottakere, gjennom en separat sikker kanal. Delte roller gir ikke sporbarhet til enkeltpersoner.
 - Sesjoner lagres server-side med hash av tilfeldig token. Nettleseren får HttpOnly, Secure, SameSite=Strict-cookie, maksimalt syv dager. Håndverkerfrist sjekkes ved hvert API-kall. Ingen passord lagres i nettleseren.
-- Innlogging begrenses til ti forsøk per IP per 15 minutter, også vellykkede forsøk. Flere på samme nett deler grensen. API-et kontrollerer rolle, opprinnelse, JSON, tillatte statuser og versjon på serveren.
+- Innlogging begrenses til ti forsøk per IP per 15 minutter, også vellykkede forsøk. Flere på samme nett deler grensen. API-et kontrollerer rolle, opprinnelse, JSON, tillatte statuser, kommentarlengde og versjon på serveren.
 - Oversikten hentes ved åpning, manuelt og etter lagring. Ingen polling eller frakoblet lagring. Ved versjonskonflikt eller usikkert lagringsresultat må fersk status hentes før neste endring.
-- Styret laster ned CSV-reserveoversikt før oppstart og ved avtalte pauser. Den inneholder tidspunkt og kan åpnes og skrives ut fra regneark. Eksporten er et øyeblikksbilde, ikke automatisk sikkerhetskopi eller gjenopprettingsformat.
+- Styret laster ned CSV-reserveoversikt før oppstart og ved avtalte pauser. Den inneholder tidspunkt og begge kommentarfeltene i egne kolonner (`KommentarStyret` og `BeskjedHåndverker`), og kan åpnes og skrives ut fra regneark. Eksporten er et øyeblikksbilde, ikke automatisk sikkerhetskopi eller gjenopprettingsformat.
 - Ved driftsstans: avtal én ansvarlig papir-/reserveoversikt. Ikke anta at nettverksfeil betyr at endringen ikke ble lagret. Hent status og avstem manuelt før registrering gjenopptas.
 - Følg Netlify-forbruk i kontrollpanelet og aktiver tilgjengelige varsler. Databasekjøring, trafikk og deployer kan bruke kreditter. Utsolgt kvote kan stoppe tjenesten; ikke stol på et gammelt prisestimat. Ingen betalt oppgradering uten godkjenning.
 
 ## Personvern og avslutning
 
-Leilighetsnummer koblet til hjemme-/samtykkestatus er fortsatt personopplysninger. Styret må fastsette behandlingsgrunnlag, informasjon til beboerne og hva de fire svarene konkret betyr. Behold nødvendig samtykkedokumentasjon i eksisterende, godkjent kanal, ikke som fritekst her.
+Leilighetsnummer koblet til hjemme-/samtykkestatus er fortsatt personopplysninger. Det samme gjelder kommentarene, også når de bare inneholder praktisk info. Styret må fastsette behandlingsgrunnlag, informasjon til beboerne og hva de fire svarene konkret betyr. Behold nødvendig samtykkedokumentasjon i eksisterende, godkjent kanal, ikke i kommentarfeltene. Styret følger opp at feltene bare brukes til praktisk info, og tømmer tekst som ikke hører hjemme der.
 
-Fastsett slettedato og ansvarlig før bruk. Appen har ikke automatisk sletting: etter avsluttet arbeid stenges håndverkertilgangen, CSV/papirkopier slettes etter vedtatt frist, og statusdata slettes/nullstilles gjennom en separat godkjent datamigrasjon eller av eier i kontrollpanelet. Inkluder sesjoner, innloggingsforsøk, deploy previews, snapshots, Netlify-backuper og tilgangslogger i vurderingen. Bevaringstider i leverandørens backuper må avklares med Netlify.
+Fastsett slettedato og ansvarlig før bruk. Appen har ikke automatisk sletting: etter avsluttet arbeid stenges håndverkertilgangen, CSV/papirkopier (som også inneholder kommentarene) slettes etter vedtatt frist, og statusdata og begge kommentarfeltene slettes/nullstilles gjennom en separat godkjent datamigrasjon eller av eier i kontrollpanelet. Inkluder sesjoner, innloggingsforsøk, deploy previews, snapshots, Netlify-backuper og tilgangslogger i vurderingen. Bevaringstider i leverandørens backuper må avklares med Netlify.
 
 Innloggingsbegrensningen lagrer HMAC av IP, ikke rå IP. Utløpte telleverk og sesjoner ryddes ved senere innlogging, ikke av en tidsstyrt jobb. De kan derfor ligge igjen når appen ikke brukes. Netlify kan ha egne tekniske logger. Ikke logg passord, cookies eller forespørselskropper.
 

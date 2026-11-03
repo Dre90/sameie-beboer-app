@@ -13,6 +13,8 @@ test("fetches overview and sends separate versioned status updates with cookies"
     id: "B24",
     response: "consent",
     completion: "pending",
+    board_comment: "",
+    craftsman_comment: "",
     version: 3,
     updated_at: "2026-10-01T12:00:00Z",
   };
@@ -39,4 +41,16 @@ test("fetches overview and sends separate versioned status updates with cookies"
       body: JSON.stringify({ completion: "performed", version: 3 }),
     }),
   );
+  for (const field of ["board_comment", "craftsman_comment"] as const) {
+    fetch.mockResolvedValue(new Response("{}"));
+    await filterApi.setComment(unit, field, "Hund i bur");
+    expect(fetch).toHaveBeenLastCalledWith(
+      `/api/units/B24/${field}`,
+      expect.objectContaining({
+        method: "PATCH",
+        credentials: "include",
+        body: JSON.stringify({ [field]: "Hund i bur", version: 3 }),
+      }),
+    );
+  }
 });

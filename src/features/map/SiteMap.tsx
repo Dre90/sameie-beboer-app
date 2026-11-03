@@ -17,6 +17,8 @@ type Floor = 1 | 2 | 3;
 export type SiteMapProps = {
   /** Optional per-unit tone for color-coding rectangles on the floor plan. */
   unitTone?: UnitToneMap;
+  /** Units that have a comment; they get a marker on the map and in the list. */
+  commentedUnitIds?: ReadonlySet<string>;
   /** Override the contents of the right-side / bottom-sheet info panel. */
   renderUnitInfo?: (unit: Unit) => ReactNode;
   /** Override the outer container className. Defaults to a full-viewport layout. */
@@ -25,6 +27,7 @@ export type SiteMapProps = {
 
 export function SiteMap({
   unitTone,
+  commentedUnitIds,
   renderUnitInfo,
   className = "relative h-[calc(100dvh-4rem)] w-full overflow-hidden",
 }: SiteMapProps = {}) {
@@ -64,7 +67,12 @@ export function SiteMap({
         className="absolute inset-y-0 left-0 z-10 hidden w-72 flex-col gap-3 border-r border-border bg-background p-3 xl:flex"
       >
         <FloorTabs floor={floor} onChange={setFloor} />
-        <UnitList selectedId={selectedId} onSelect={handleSelect} currentFloor={floor} />
+        <UnitList
+          selectedId={selectedId}
+          onSelect={handleSelect}
+          currentFloor={floor}
+          commentedUnitIds={commentedUnitIds}
+        />
       </aside>
 
       {/* Map */}
@@ -80,6 +88,7 @@ export function SiteMap({
           selectedId={selectedId}
           onSelect={handleSelect}
           unitTone={unitTone}
+          commentedUnitIds={commentedUnitIds}
         />
       </div>
 
@@ -131,7 +140,12 @@ export function SiteMap({
             <FloorTabs floor={floor} onChange={setFloor} />
           </div>
           <div className="flex min-h-0 flex-1 flex-col">
-            <UnitList selectedId={selectedId} onSelect={handleSelect} currentFloor={floor} />
+            <UnitList
+              selectedId={selectedId}
+              onSelect={handleSelect}
+              currentFloor={floor}
+              commentedUnitIds={commentedUnitIds}
+            />
           </div>
         </SheetContent>
       </Sheet>

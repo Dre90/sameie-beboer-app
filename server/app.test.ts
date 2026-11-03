@@ -52,7 +52,8 @@ beforeAll(async () => {
 
 beforeEach(async () => {
   await database.sql`TRUNCATE sessions, login_attempts`;
-  await database.sql`UPDATE unit_status SET response = 'unanswered', completion = 'pending', version = 0`;
+  await database.sql`UPDATE unit_status SET response = 'unanswered', completion = 'pending',
+    board_comment = '', craftsman_comment = '', version = 0`;
   await store.createSession(
     digest("a".repeat(64)),
     "board",
@@ -81,12 +82,15 @@ test("migration seeds exactly the 47 map units without personal data", async () 
     allUnits.map((unit) => unit.id).sort(),
   );
   expect(Object.keys(body.units[0]).sort()).toEqual([
+    "board_comment",
     "completion",
+    "craftsman_comment",
     "id",
     "response",
     "updated_at",
     "version",
   ]);
+  expect(body.units[0]).toMatchObject({ board_comment: "", craftsman_comment: "" });
   expect(body.eventDate).toBe("2026-10-01");
   expect(body.units[0].updated_at).toBe(new Date(body.units[0].updated_at).toISOString());
   expect(result.headers.get("cache-control")).toContain("no-store");
@@ -164,6 +168,80 @@ test("atomic version check rejects a simultaneous update without overwriting", a
   expect(results.map((result) => result.status).sort((first, second) => first - second)).toEqual([
     200, 409,
   ]);
+});
+
+test("each role writes its own comment and the board can only clear the craftsman's message", async () => {
+  const patch = async (field: string, value: unknown, version: number, cookie: string) => {
+    const response = await request(
+      `/units/B24/${field}`,
+      "PATCH",
+      { [field]: value, version },
+      cookie,
+    );
+    return { status: response.status, body: await response.json() };
+  };
+  expect(await patch("board_comment", "Hund i bur", 0, craftsmanCookie)).toEqual({
+    status: 403,
+    body: { error: "Bare styret kan skrive styrets kommentar" },
+  });
+  const boardWrite = await patch("board_comment", "  Hund i bur\r\nRolig  ", 0, boardCookie);
+  expect(boardWrite.status).toBe(200);
+  expect(boardWrite.body.unit).toMatchObject({
+    board_comment: "Hund i bur\nRolig",
+    craftsman_comment: "",
+    response: "unanswered",
+    completion: "pending",
+    version: 1,
+  });
+  expect(
+    (await patch("craftsman_comment", "Ingen åpnet", 1, craftsmanCookie)).body.unit,
+  ).toMatchObject({
+    board_comment: "Hund i bur\nRolig",
+    craftsman_comment: "Ingen åpnet",
+    version: 2,
+  });
+  expect(await patch("craftsman_comment", "Endret av styret", 2, boardCookie)).toEqual({
+    status: 403,
+    body: { error: "Styret kan bare tømme håndverkerens beskjed" },
+  });
+  expect((await patch("craftsman_comment", "  ", 2, boardCookie)).body.unit).toMatchObject({
+    craftsman_comment: "",
+    version: 3,
+  });
+  expect((await patch("board_comment", "Utdatert", 2, boardCookie)).status).toBe(409);
+  expect((await patch("board_comment", "", 3, boardCookie)).body.unit).toMatchObject({
+    board_comment: "",
+    version: 4,
+  });
+});
+
+test("comments are validated by the API and limited by the database", async () => {
+  const patch = (value: unknown, extra: Record<string, unknown> = {}) =>
+    request(
+      "/units/C1/board_comment",
+      "PATCH",
+      { board_comment: value, version: 0, ...extra },
+      boardCookie,
+    );
+  const rejected = await patch("a".repeat(501));
+  expect(rejected.status).toBe(400);
+  expect(await rejected.json()).toEqual({ error: "Ugyldig leilighet, kommentar eller versjon" });
+  for (const response of await Promise.all([
+    patch("🐕".repeat(501)),
+    patch("Hund\u0000i bur"),
+    patch(42),
+    patch(null),
+    patch("x", { craftsman_comment: "y" }),
+  ])) {
+    expect(response.status).toBe(400);
+  }
+  expect((await patch("x".repeat(3000))).status).toBe(413);
+  const accepted = await patch("🐕".repeat(500));
+  expect(accepted.status).toBe(200);
+  expect((await accepted.json()).unit.board_comment).toBe("🐕".repeat(500));
+  await expect(
+    database.sql`UPDATE unit_status SET craftsman_comment = ${"a".repeat(501)} WHERE id = 'C1'`,
+  ).rejects.toThrow();
 });
 
 test("validates writes and blocks cross-origin requests", async () => {
@@ -257,6 +335,16 @@ test("only board can export fresh status with date and no personal fields", asyn
   expect(csv).toContain("B24;Samtykke;Ikke utført");
   expect(csv).toContain("2026-10-01");
   expect(csv.trim().split("\n")).toHaveLength(48);
+});
+
+test("export keeps comments in their own escaped columns", async () => {
+  await store.update("B24", "board_comment", "Hund i bur; rolig\nRing først", 0);
+  await store.update("C1", "craftsman_comment", '=HYPERLINK("x")', 0);
+  const csv = await (await request("/export", "GET", undefined, boardCookie)).text();
+  expect(csv).toContain("SistEndret;KommentarStyret;BeskjedHåndverker");
+  expect(csv).toContain('"Hund i bur; rolig\nRing først";\n');
+  expect(csv).toContain(`;"'=HYPERLINK(""x"")"\n`);
+  expect(csv).not.toContain(";=HYPERLINK");
 });
 
 test("malformed input and missing or ambiguous credentials fail closed", async () => {

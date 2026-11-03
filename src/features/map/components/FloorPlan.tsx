@@ -1,4 +1,5 @@
 import { type UnitGeometry, VIEW_BOX } from "../data/geometry";
+import { isLargeUnit } from "../data/units";
 import { getTone, type UnitTone, type UnitToneMap } from "../lib/tone";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +9,7 @@ type Props = {
   onSelect: (id: string) => void;
   floor: 1 | 2 | 3;
   unitTone?: UnitToneMap;
+  commentedUnitIds?: ReadonlySet<string>;
 };
 
 const toneLabels: Record<UnitTone, string> = {
@@ -19,7 +21,14 @@ const toneLabels: Record<UnitTone, string> = {
   done: "Fullført eller levert",
 };
 
-export function FloorPlan({ geometry, selectedId, onSelect, floor, unitTone }: Props) {
+export function FloorPlan({
+  geometry,
+  selectedId,
+  onSelect,
+  floor,
+  unitTone,
+  commentedUnitIds,
+}: Props) {
   return (
     <svg
       viewBox={`0 0 ${VIEW_BOX.width} ${VIEW_BOX.height}`}
@@ -51,6 +60,8 @@ export function FloorPlan({ geometry, selectedId, onSelect, floor, unitTone }: P
         const isSelected = id === selectedId;
         const isTownhouse = id.startsWith("C");
         const tone = getTone(unitTone, id);
+        const hasComment = commentedUnitIds?.has(id) ?? false;
+        const commentNote = hasComment ? ", har kommentar" : "";
         return (
           <g key={id}>
             <rect
@@ -62,7 +73,7 @@ export function FloorPlan({ geometry, selectedId, onSelect, floor, unitTone }: P
               onClick={() => onSelect(id)}
               role="button"
               tabIndex={0}
-              aria-label={`Leilighet ${id}, ${toneLabels[tone]}`}
+              aria-label={`Leilighet ${id}${isLargeUnit(id) ? ", stor leilighet" : ""}, ${toneLabels[tone]}${commentNote}`}
               aria-pressed={isSelected}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
@@ -83,8 +94,19 @@ export function FloorPlan({ geometry, selectedId, onSelect, floor, unitTone }: P
               strokeWidth={isSelected ? 4 : 1.5}
               vectorEffect="non-scaling-stroke"
             >
-              <title>{`${id}: ${toneLabels[tone]}`}</title>
+              <title>{`${id}: ${toneLabels[tone]}${commentNote}`}</title>
             </rect>
+            {hasComment && (
+              <circle
+                cx={rect.x + rect.w - 10}
+                cy={rect.y + 10}
+                r={6}
+                aria-hidden="true"
+                data-comment-marker={id}
+                className="pointer-events-none fill-foreground stroke-background"
+                strokeWidth={2}
+              />
+            )}
             <text
               x={rect.x + rect.w / 2}
               y={rect.y + rect.h / 2}

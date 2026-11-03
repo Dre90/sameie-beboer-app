@@ -22,6 +22,8 @@ const overview: Overview = {
       id: "B24",
       response: "home",
       completion: "pending",
+      board_comment: "",
+      craftsman_comment: "",
       version: 0,
       updated_at: "2026-09-15T12:00:00Z",
     },

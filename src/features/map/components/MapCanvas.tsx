@@ -21,12 +21,14 @@ export function MapCanvas({
   selectedId,
   onSelect,
   unitTone,
+  commentedUnitIds,
 }: {
   geometry: UnitGeometry;
   floor: Floor;
   selectedId: string | null;
   onSelect: (id: string) => void;
   unitTone?: UnitToneMap;
+  commentedUnitIds?: ReadonlySet<string>;
 }) {
   return (
     <div className="relative h-full w-full overflow-hidden bg-background">
@@ -48,6 +50,7 @@ export function MapCanvas({
               onSelect={onSelect}
               floor={floor}
               unitTone={unitTone}
+              commentedUnitIds={commentedUnitIds}
             />
           </TransformComponent>
         </WheelHandler>

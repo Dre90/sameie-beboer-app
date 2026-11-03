@@ -27,6 +27,7 @@
   --color-map-self-service: var(--map-self-service);
   --color-map-unanswered: var(--map-unanswered);
   --color-ring: var(--ring);
+  --color-control-border: var(--control-border);
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
@@ -71,6 +72,9 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0.005 34.3);
   --input: oklch(0.922 0.005 34.3);
+  /* Outline of interactive controls (chips, outline buttons, text fields).
+     Darker than --border so controls meet the 3:1 non-text contrast minimum. */
+  --control-border: oklch(0.6 0.012 43);
   --ring: oklch(0.714 0.014 41.2);
   --chart-1: oklch(0.845 0.143 164.978);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -115,6 +119,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
+  --control-border: oklch(1 0 0 / 40%);
   --ring: oklch(0.547 0.021 43.1);
   --chart-1: oklch(0.845 0.143 164.978);
   --chart-2: oklch(0.696 0.17 162.48);

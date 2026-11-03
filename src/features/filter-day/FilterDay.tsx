@@ -27,6 +27,7 @@ import {
 import { useAuth } from "@/features/auth";
 import { SiteMap, type UnitTone } from "@/features/map";
 import { UnitInfo } from "@/features/map/components/UnitInfo";
+import { UnitCommentEditor, UnitCommentNotice, ownCommentField } from "./components/UnitComments";
 import { useFilterDay } from "./hooks/useFilterDay";
 import { filterApi } from "@/lib/filter-api";
 import { cn } from "@/lib/utils";
@@ -52,6 +53,11 @@ export function FilterDay() {
     ]),
   );
   const completed = overview?.units.filter((unit) => unit.completion !== "pending").length ?? 0;
+  const commentedUnitIds = new Set(
+    overview?.units
+      .filter((unit) => unit.board_comment || unit.craftsman_comment)
+      .map((unit) => unit.id),
+  );
   return (
     <main className="flex h-dvh min-h-0 flex-col bg-background text-foreground">
       <header className="flex shrink-0 flex-col gap-2 border-b border-border px-4 py-3">
@@ -126,6 +132,14 @@ export function FilterDay() {
               {tone === "done" ? "Fullført / levert" : responseLabels[tone]}
             </li>
           ))}
+          <li className="flex items-center gap-1.5">
+            <span
+              aria-hidden
+              data-testid="legend-comment-marker"
+              className="size-2.5 shrink-0 rounded-full bg-foreground"
+            />
+            Har kommentar
+          </li>
         </ul>
         <p role="status" className="min-h-4 text-xs text-muted-foreground">
           {busy ? "Laster ..." : message}
@@ -141,6 +155,7 @@ export function FilterDay() {
           <SiteMap
             className="absolute inset-0 overflow-hidden"
             unitTone={tones}
+            commentedUnitIds={commentedUnitIds}
             renderUnitInfo={(unit) => {
               const status = byId.get(unit.id);
               return (
@@ -165,13 +180,30 @@ export function FilterDay() {
                     )}
                   </div>
                   {status ? (
-                    <UnitPanel
-                      key={`${status.id}:${status.version}`}
-                      unit={status}
-                      isBoard={isBoard}
-                      disabled={busy || stale}
-                      onSave={save}
-                    />
+                    <>
+                      <UnitCommentNotice
+                        key={`notice:${status.id}`}
+                        unit={status}
+                        isBoard={isBoard}
+                        disabled={busy || stale}
+                        onSave={save}
+                      />
+                      {/* Keyed by saved values, so drafts survive saves of the other fields. */}
+                      <UnitPanel
+                        key={`panel:${status.id}:${status.response}`}
+                        unit={status}
+                        isBoard={isBoard}
+                        disabled={busy || stale}
+                        onSave={save}
+                      />
+                      <UnitCommentEditor
+                        key={`editor:${status.id}:${status[ownCommentField(isBoard)]}`}
+                        unit={status}
+                        isBoard={isBoard}
+                        disabled={busy || stale}
+                        onSave={save}
+                      />
+                    </>
                   ) : (
                     <p>Status ikke tilgjengelig.</p>
                   )}

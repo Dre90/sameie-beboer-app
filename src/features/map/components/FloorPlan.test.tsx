@@ -99,6 +99,77 @@ test("map buttons expose status and support mouse, Enter and Space", async () =>
   expect(screen.getByText("A12")).toHaveAttribute("paint-order", "stroke");
 });
 
+test("map buttons announce large apartments without changing the visible tooltip", () => {
+  render(
+    <FloorPlan
+      geometry={floor1Geometry}
+      floor={1}
+      selectedId={null}
+      onSelect={vi.fn()}
+      unitTone={new Map([["B16", "home"]])}
+    />,
+  );
+  const large = screen.getByRole("button", { name: "Leilighet B16, stor leilighet, Hjemme" });
+  expect(large.querySelector("title")).toHaveTextContent(/^B16: Hjemme$/);
+  expect(
+    screen.getByRole("button", { name: "Leilighet B15, Status ikke tilgjengelig" }),
+  ).toBeInTheDocument();
+  expect(screen.getByText("B16")).toBeInTheDocument();
+  expect(screen.queryByText(/stor/i)).not.toBeInTheDocument();
+});
+
+test("units with a comment get a corner marker and announce it", () => {
+  const { container } = render(
+    <FloorPlan
+      geometry={floor1Geometry}
+      floor={1}
+      selectedId={null}
+      onSelect={vi.fn()}
+      unitTone={new Map([["A11", "home"]])}
+      commentedUnitIds={new Set(["A11", "B16"])}
+    />,
+  );
+  const commented = screen.getByRole("button", { name: "Leilighet A11, Hjemme, har kommentar" });
+  expect(commented.querySelector("title")).toHaveTextContent(/^A11: Hjemme, har kommentar$/);
+  expect(
+    screen.getByRole("button", {
+      name: "Leilighet B16, stor leilighet, Status ikke tilgjengelig, har kommentar",
+    }),
+  ).toBeInTheDocument();
+  const markers = container.querySelectorAll("circle[data-comment-marker]");
+  expect([...markers].map((marker) => marker.getAttribute("data-comment-marker"))).toEqual([
+    "A11",
+    "B16",
+  ]);
+  const marker = container.querySelector('circle[data-comment-marker="A11"]')!;
+  expect(marker).toHaveAttribute("aria-hidden", "true");
+  expect(marker).toHaveClass("pointer-events-none", "fill-foreground", "stroke-background");
+  expect(
+    screen.getByRole("button", { name: "Leilighet A12, Status ikke tilgjengelig" }),
+  ).toBeInTheDocument();
+});
+
+test("comment markers stay inside each tile and clear of the centered label", () => {
+  const { container } = render(
+    <FloorPlan
+      geometry={floor1Geometry}
+      floor={1}
+      selectedId={null}
+      onSelect={vi.fn()}
+      commentedUnitIds={new Set(Object.keys(floor1Geometry))}
+    />,
+  );
+  for (const [id, rect] of Object.entries(floor1Geometry)) {
+    const marker = container.querySelector(`circle[data-comment-marker="${id}"]`)!;
+    const [cx, cy, r] = ["cx", "cy", "r"].map((name) => Number(marker.getAttribute(name)));
+    expect(cx + r, id).toBeLessThanOrEqual(rect.x + rect.w);
+    expect(cy - r, id).toBeGreaterThanOrEqual(rect.y);
+    expect(cy + r, id).toBeLessThanOrEqual(rect.y + rect.h);
+    // Labels are at most three 18px characters wide, about 20 units on each side of the center.
+    expect(cx - r - (rect.x + rect.w / 2), id).toBeGreaterThanOrEqual(20);
+  }
+});
+
 test("map has no automated accessibility violations", async () => {
   const { container } = render(
     <main>
