@@ -4,6 +4,8 @@ Kart og arbeidsoversikt for én filterbyttedag, med 47 leiligheter. React 19, Ty
 
 Ingen personregister, e-post eller telefon. Beboersvar og utførelse er separate felt. Styret endrer svar og eksporterer reserveoversikt. Begge roller kan markere utført/levert og angre med bekreftelse. Dette er ikke en adgangskontroll: markeringen «Samtykke» er ikke i seg selv dokumentasjon på tillatelse til å gå inn.
 
+Øverst i leilighetspanelet viser et stort kort i kartfargen det lagrede beboersvaret og hva håndverkeren skal gjøre: «Hjemme» – ring på, «Samtykke» – du kan låse deg inn, «Gjør selv» – sett filteret utenfor døra, og «Mangler svar» – ring på, ikke lås deg inn, og skriv en beskjed til styret hvis ingen åpner. Tekstene ligger i `ResponseInstruction.tsx`.
+
 Hver leilighet har to kommentarfelt på maks 500 tegn. Styret skriver «Kommentar fra styret», og håndverkeren skriver «Beskjed til styret». Hver rolle endrer bare sitt eget felt og ser det andre som lesetekst. Styret kan tømme håndverkerens beskjed etter bekreftelse, men ikke endre den. Feltene er appens eneste fritekst og skal bare brukes til praktisk info, for eksempel «Hund i bur». Ikke skriv navn, telefonnummer, helseopplysninger eller samtykkedokumentasjon der. Leiligheter med kommentar har en prikk i kartet og et ikon i lista.
 
 Store leiligheter (B16–B19, B25–B28 og B31–B36) er tegnet større i kartet, så håndverkeren kan ta med riktig filter. B-blokka og rekkehusene slutter på samme høyrekant, som i oversiktsplanen.

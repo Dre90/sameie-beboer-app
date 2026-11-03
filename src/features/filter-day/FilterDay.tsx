@@ -27,6 +27,7 @@ import {
 import { useAuth } from "@/features/auth";
 import { SiteMap, type UnitTone } from "@/features/map";
 import { UnitInfo } from "@/features/map/components/UnitInfo";
+import { ResponseInstruction } from "./components/ResponseInstruction";
 import { UnitCommentEditor, UnitCommentNotice, ownCommentField } from "./components/UnitComments";
 import { useFilterDay } from "./hooks/useFilterDay";
 import { filterApi } from "@/lib/filter-api";
@@ -181,6 +182,7 @@ export function FilterDay() {
                   </div>
                   {status ? (
                     <>
+                      <ResponseInstruction unit={status} />
                       <UnitCommentNotice
                         key={`notice:${status.id}`}
                         unit={status}
@@ -232,12 +234,9 @@ function UnitPanel({
   const [confirmOpen, setConfirmOpen] = useState(false);
   return (
     <div className="flex flex-col gap-5" data-testid={`unit-panel-${unit.id}`}>
-      <div className="flex flex-wrap gap-2">
-        <Badge variant="outline">{responseLabels[unit.response]}</Badge>
-        <Badge variant={unit.completion === "pending" ? "secondary" : "default"}>
-          {completionLabels[unit.completion]}
-        </Badge>
-      </div>
+      <Badge variant={unit.completion === "pending" ? "secondary" : "default"}>
+        {completionLabels[unit.completion]}
+      </Badge>
       {isBoard && (
         <form
           onSubmit={(event) => {
@@ -247,7 +246,7 @@ function UnitPanel({
         >
           <FieldGroup>
             <Field>
-              <FieldLabel id={`response-${unit.id}`}>Beboersvar</FieldLabel>
+              <FieldLabel id={`response-${unit.id}`}>Endre beboersvar</FieldLabel>
               <ToggleGroup
                 size="lg"
                 aria-labelledby={`response-${unit.id}`}

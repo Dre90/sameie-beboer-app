@@ -105,6 +105,9 @@ test("board explicitly saves a response", async () => {
   });
   render(<FilterDay />);
   const panel = await select();
+  expect(screen.getByRole("group", { name: "Endre beboersvar" })).toContainElement(
+    panel.getByRole("button", { name: "Hjemme" }),
+  );
   await userEvent.click(panel.getByRole("button", { name: "Hjemme" }));
   expect(filterApi.setResponse).not.toHaveBeenCalled();
   await userEvent.click(panel.getByRole("button", { name: "Lagre svar" }));
@@ -124,9 +127,9 @@ test("uses larger text controls and high-contrast status chips in the unit panel
   expect(panel.getByRole("button", { name: "Hjemme" })).toHaveClass("h-10", "text-base");
   expect(panel.getByText("Ikke utført")).toHaveClass("h-10", "text-sm");
   expect(panel.getByText("Ikke utført")).toHaveClass("border-control-border");
-  expect(panel.getByText("Mangler svar", { selector: "[data-slot=badge]" })).toHaveClass(
-    "border-control-border",
-  );
+  expect(
+    within(screen.getByRole("group", { name: "Beboersvar" })).getByText("Mangler svar"),
+  ).toHaveClass("text-2xl");
   const consent = panel.getByRole("button", { name: "Samtykke" });
   expect(consent).toHaveClass("border-control-border", "aria-pressed:bg-primary");
   expect(consent).toHaveAttribute("aria-pressed", "false");
@@ -345,6 +348,34 @@ test("craftsman reads the board's comment first and sends a message to the board
   expect(screen.getByRole("textbox", { name: "Beskjed til styret" })).toHaveValue(
     "Ingen åpnet, la lapp",
   );
+});
+
+test("craftsman sees what to do before the board's comment and the action buttons", async () => {
+  role = "craftsman";
+  withComments("B24", { response: "consent", board_comment: "Hund i bur" });
+  render(<FilterDay />);
+  await select("B24", "B24, har kommentar");
+  const instruction = screen.getByRole("group", { name: "Beboersvar" });
+  expect(instruction).toHaveTextContent("Samtykke");
+  expect(instruction).toHaveTextContent("Du kan låse deg inn");
+  const comesBefore = (other: Element) =>
+    instruction.compareDocumentPosition(other) & Node.DOCUMENT_POSITION_FOLLOWING;
+  expect(comesBefore(screen.getByRole("note", { name: "Kommentar fra styret" }))).toBeTruthy();
+  expect(comesBefore(screen.getByTestId("unit-panel-B24"))).toBeTruthy();
+  expect(screen.queryByRole("group", { name: "Endre beboersvar" })).not.toBeInTheDocument();
+});
+
+test("the instruction follows the saved response, not an unsaved choice", async () => {
+  persistWrites();
+  render(<FilterDay />);
+  const panel = await select();
+  const instruction = () => screen.getByRole("group", { name: "Beboersvar" });
+  await userEvent.click(panel.getByRole("button", { name: "Gjør selv" }));
+  expect(instruction()).toHaveTextContent("Mangler svar");
+  await userEvent.click(panel.getByRole("button", { name: "Lagre svar" }));
+  expect(await screen.findByRole("status")).toHaveTextContent("B24: Lagret");
+  expect(instruction()).toHaveTextContent("Gjør selv");
+  expect(instruction()).toHaveTextContent("Sett filteret utenfor døra");
 });
 
 test("board clears the craftsman's message and the comment marker disappears", async () => {
