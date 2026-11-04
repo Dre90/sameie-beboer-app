@@ -8,7 +8,7 @@ Ingen personregister, e-post eller telefon. Beboersvar og utførelse er separate
 
 Hver leilighet har to kommentarfelt på maks 500 tegn. Styret skriver «Kommentar fra styret», og håndverkeren skriver «Beskjed til styret». Hver rolle endrer bare sitt eget felt og ser det andre som lesetekst. Styret kan tømme håndverkerens beskjed etter bekreftelse, men ikke endre den. Feltene er appens eneste fritekst og skal bare brukes til praktisk info, for eksempel «Hund i bur». Ikke skriv navn, telefonnummer, helseopplysninger eller samtykkedokumentasjon der. Leiligheter med kommentar har en prikk i kartet og et ikon i lista.
 
-Store leiligheter (B16–B19, B25–B28 og B31–B36) er tegnet større i kartet, så håndverkeren kan ta med riktig filter. B-blokka og rekkehusene slutter på samme høyrekant, som i oversiktsplanen.
+Store leiligheter (A21, B16–B19, B25–B28 og B31–B36) er tegnet større i kartet, så håndverkeren kan ta med riktig filter. B-blokka og rekkehusene slutter på samme høyrekant, som i oversiktsplanen.
 
 ## Lokal utvikling
 

@@ -6,8 +6,9 @@ test("register has 47 unique units", () => {
   expect(unitsById.size).toBe(47);
 });
 
-test("large units are the B16–B19, B25–B28 and every third-floor unit", () => {
+test("large units are A21, B16–B19, B25–B28 and every third-floor unit", () => {
   expect([...largeUnitIds].sort()).toEqual([
+    "A21",
     "B16",
     "B17",
     "B18",
@@ -23,14 +24,14 @@ test("large units are the B16–B19, B25–B28 and every third-floor unit", () =
     "B35",
     "B36",
   ]);
-  for (const id of largeUnitIds) expect(unitsById.get(id)?.building).toBe("B");
+  for (const id of largeUnitIds) expect(unitsById.get(id)?.building).toMatch(/^[AB]$/);
   const thirdFloor = allUnits.filter((u) => "floor" in u && u.floor === 3).map((u) => u.id);
   expect(thirdFloor.every(isLargeUnit)).toBe(true);
 });
 
 test("isLargeUnit is false for normal apartments, townhouses and unknown ids", () => {
   expect(isLargeUnit("B16")).toBe(true);
-  for (const id of ["B11", "B15", "B21", "B24", "A11", "A28", "C1", "X99"]) {
+  for (const id of ["A11", "A22", "A28", "B11", "B15", "B21", "B24", "C1", "X99"]) {
     expect(isLargeUnit(id)).toBe(false);
   }
 });

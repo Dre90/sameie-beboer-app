@@ -1,3 +1,5 @@
+import { isLargeUnit } from "./units";
+
 export type Rect = { x: number; y: number; w: number; h: number };
 
 export const VIEW_BOX = { width: 1000, height: 700 };
@@ -23,15 +25,21 @@ const A_W = 120;
 const A_TOP = 40;
 const A_BOTTOM = 430;
 
-const aColumn = (count: number): Rect[] => {
-  const totalH = A_BOTTOM - A_TOP;
-  const h = Math.floor((totalH - (count - 1) * GAP) / count);
-  return Array.from({ length: count }, (_, i) => ({
-    x: A_X,
-    y: A_TOP + i * (h + GAP),
-    w: A_W,
-    h,
-  }));
+// The column is a grid of equal rows. A large unit spans two rows, so floors 1 and 2 share row height.
+const aColumn = (spans: number[]): Rect[] => {
+  const rows = spans.reduce((sum, span) => sum + span, 0);
+  const rowH = Math.floor((A_BOTTOM - A_TOP - (rows - 1) * GAP) / rows);
+  let used = 0;
+  return spans.map((span) => {
+    const rect = {
+      x: A_X,
+      y: A_TOP + used * (rowH + GAP),
+      w: A_W,
+      h: span * rowH + (span - 1) * GAP,
+    };
+    used += span;
+    return rect;
+  });
 };
 
 // Building B — L-shape (top-right): a horizontal strip of normal units and a wing on the right.
@@ -77,14 +85,19 @@ const bIds = (floor: 1 | 2 | 3, count: number) =>
 // C1 is rightmost, C7 leftmost. Our rects are left-to-right, so reverse.
 const cIdsLeftToRight = ["C7", "C6", "C5", "C4", "C3", "C2", "C1"];
 
+const aGeometry = (floor: 1 | 2, count: number): UnitGeometry => {
+  const ids = aIds(floor, count);
+  return mapIds(ids, aColumn(ids.map((id) => (isLargeUnit(id) ? 2 : 1))));
+};
+
 export const floor1Geometry: UnitGeometry = {
-  ...mapIds(aIds(1, 9), aColumn(9)),
+  ...aGeometry(1, 9),
   ...mapIds(bIds(1, 9), bFloor(5)),
   ...mapIds(cIdsLeftToRight, cRow()),
 };
 
 export const floor2Geometry: UnitGeometry = {
-  ...mapIds(aIds(2, 8), aColumn(8)),
+  ...aGeometry(2, 8),
   ...mapIds(bIds(2, 8), bFloor(4)),
   ...mapIds(cIdsLeftToRight, cRow()),
 };

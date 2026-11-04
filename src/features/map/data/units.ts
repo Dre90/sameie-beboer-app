@@ -47,6 +47,7 @@ export const unitsById = new Map<string, Unit>(allUnits.map((u) => [u.id, u]));
 
 // Large apartments need a different filter size, so the craftsman must know them in advance.
 export const largeUnitIds: ReadonlySet<string> = new Set([
+  "A21",
   "B16",
   "B17",
   "B18",

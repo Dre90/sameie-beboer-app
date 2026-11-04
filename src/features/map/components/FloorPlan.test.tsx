@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import axe from "axe-core";
 import { FloorPlan } from "./FloorPlan";
-import { floor1Geometry } from "../data/geometry";
+import { floor1Geometry, floor2Geometry } from "../data/geometry";
 import type { UnitTone } from "../lib/tone";
 
 test.each(["unanswered", "home", "consent", "self_service", "done"] as UnitTone[])(
@@ -116,6 +116,24 @@ test("map buttons announce large apartments without changing the visible tooltip
   ).toBeInTheDocument();
   expect(screen.getByText("B16")).toBeInTheDocument();
   expect(screen.queryByText(/stor/i)).not.toBeInTheDocument();
+});
+
+test("A21 on floor 2 is announced as a large apartment", () => {
+  render(
+    <FloorPlan
+      geometry={floor2Geometry}
+      floor={2}
+      selectedId={null}
+      onSelect={vi.fn()}
+      unitTone={new Map([["A21", "consent"]])}
+    />,
+  );
+  expect(
+    screen.getByRole("button", { name: "Leilighet A21, stor leilighet, Samtykke" }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("button", { name: "Leilighet A22, Status ikke tilgjengelig" }),
+  ).toBeInTheDocument();
 });
 
 test("units with a comment get a corner marker and announce it", () => {

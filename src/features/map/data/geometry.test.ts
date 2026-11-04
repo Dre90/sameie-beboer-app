@@ -50,6 +50,31 @@ test.each(floors)("large units on floor %i are clearly larger than normal units"
   expect(Math.min(...b.map(([, r]) => Math.min(r.w, r.h)))).toBeGreaterThanOrEqual(80);
 });
 
+test("A21 spans two rows of the A column and is clearly larger than the other A units", () => {
+  const a = entries(2, "A");
+  const [, a21] = a.find(([id]) => id === "A21")!;
+  const others = a.filter(([id]) => id !== "A21").map(([, r]) => r);
+  expect(a21.w).toBe(others[0].w);
+  expect(a21.x).toBe(others[0].x);
+  expect(area(a21)).toBeGreaterThan(1.5 * Math.max(...others.map(area)));
+  expect(a21.h).toBe(2 * others[0].h + 4);
+  const lastOther = Math.max(...others.map(bottom));
+  expect(a21.y).toBe(lastOther + 4);
+});
+
+test("floors 1 and 2 share row height and bottom edge in the A column", () => {
+  const f1 = entries(1, "A").map(([, r]) => r);
+  const f2 = entries(2, "A").map(([id, r]) => [id, r] as const);
+  expect(Math.max(...f2.filter(([id]) => id !== "A21").map(([, r]) => r.h))).toBe(f1[0].h);
+  expect(Math.max(...f2.map(([, r]) => bottom(r)))).toBe(Math.max(...f1.map(bottom)));
+});
+
+test("A column units on floor 1 are equal and none are large", () => {
+  const f1 = entries(1, "A");
+  expect(f1.some(([id]) => isLargeUnit(id))).toBe(false);
+  expect(new Set(f1.map(([, r]) => r.h)).size).toBe(1);
+});
+
 test.each([
   [1, ["B11", "B12", "B13", "B14", "B15"], ["B16", "B17", "B18", "B19"]],
   [2, ["B21", "B22", "B23", "B24"], ["B25", "B26", "B27", "B28"]],
